@@ -38,7 +38,15 @@ author: LBRACE 'name' COLON TEXT
 
 templates: 'templates' LBRACE sources+ sinks+ RBRACE;
 
+// Sources are input elements ("attributes") of a particular document ("category"),
+// both of which are well defined by schema vocabularies.
+// You can also specify child attributes if the parent attribute of a category is
+// a schema in its own write, separated by period (e.g. "student.age" of "University")
 sources: 'sources' LBRACE source+ RBRACE;
+
+// Sinks describe transformations that are done to a particular element. They can
+// be a pattern matching transformation, or a function transformation (for complex
+// elements).
 sinks: 'sinks' LBRACE sink+ RBRACE;
 
 source: 'source' LBRACE 'name' COLON TEXT 'attribute' COLON TEXT
@@ -57,6 +65,8 @@ transformationMethod: 'function' LBRACE 'name' COLON TEXT
 
 parameter: LBRACK 'type' COLON TEXT 'value' COLON TEXT RBRACK;
 
+// Rules describe a mapping between sources and sinks.
+// XSLT is used to convert one element into another element.
 rules: 'rules' LBRACE 'outputCategory' COLON IDENTIFIER rule+ RBRACE;
 
 rule: 'rule' LBRACE 'source' COLON TEXT
@@ -73,6 +83,8 @@ header {
     {name: "John Doe", email: "john.doe@example.com"},
     {name: "Jane Smith", email: "jane.smith@example.com"}
   ]
+  
+  // Comments can also be preceded by whitespace.
   description: "A template language for generating dynamic content"
 }
 
