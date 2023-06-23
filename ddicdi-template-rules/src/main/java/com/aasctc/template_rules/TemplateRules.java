@@ -1,3 +1,6 @@
+
+package com.aasctc.template_rules;
+
 import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,9 +15,9 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class TemplateInterpreter {
+public class TemplateRules {
 
-    private static final Logger logger = LogManager.getLogger(TemplateInterpreter.class);
+    private static final Logger logger = LogManager.getLogger(TemplateRules.class);
 
     public static void main(String[] args) {
         // Initialize Log4j with the configuration file
@@ -70,7 +73,7 @@ public class TemplateInterpreter {
             printHelp(options);
         } catch (IOException e) {
             logger.error("Error reading or writing files: {}", e.getMessage());
-        } catch (TemplateInterpretationException e) {
+        } catch (TemplateException e) {
             logger.error("Error interpreting input XML: {}", e.getMessage());
         } catch (TransformerException e) {
             logger.error("Error transforming XML: {}", e.getMessage());
@@ -87,7 +90,7 @@ public class TemplateInterpreter {
         System.out.println("TemplateInterpreter version " + version);
     }
 
-    private static String interpretInput(String inputFilePath) throws IOException, TemplateInterpretationException {
+    private static String interpretInput(String inputFilePath) throws IOException, TemplateException {
         // Read the input XML file
         String inputXml = readFile(inputFilePath);
 
