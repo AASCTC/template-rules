@@ -25,7 +25,8 @@
 	                  <argument>-package</argument>
 	                  <argument>com.aasctc.template_rules.antlr</argument>
 	              </arguments>
-	              <outputDirectory>src/main/generated-sources/antlr4/com.aasctc.templaterules.antlr</outputDirectory>
+	              <outputDirectory>src/main/generated-sources/antlr4</outputDirectory>
+	              <!-- TODO it's stuck in the defualt package for some reason. -->
 	          </configuration>
 	          <dependencies>
 	              <dependency>
