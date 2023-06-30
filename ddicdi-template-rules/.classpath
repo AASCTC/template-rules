@@ -35,10 +35,11 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/unstoppable/git/template-rules/antlr4-runtime-4.13.0.jar"/>
-	<classpathentry kind="lib" path="/home/unstoppable/git/template-rules/commons-cli-1.5.0.jar"/>
-	<classpathentry kind="lib" path="/home/unstoppable/git/template-rules/log4j-api-2.20.0.jar"/>
-	<classpathentry kind="lib" path="/home/unstoppable/git/template-rules/log4j-core-2.20.0.jar"/>
-	<classpathentry kind="lib" path="/home/unstoppable/git/template-rules/Saxon-HE-12.2.jar"/>
+	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
