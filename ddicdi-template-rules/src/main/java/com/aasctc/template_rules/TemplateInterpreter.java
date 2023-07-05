@@ -1,10 +1,15 @@
 package com.aasctc.template_rules;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.aasctc.template_rules.antlr.TemplateRulesLexer;
 import com.aasctc.template_rules.antlr.TemplateRulesParser;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.TemplateRulesDocumentContext;
+
 import net.sf.saxon.TransformerFactoryImpl;
 
 import javax.xml.transform.*;
@@ -32,7 +37,27 @@ public class TemplateInterpreter {
             throw new TemplateException("Failed to transform XML using XSLT");
         }
     }
+    
+    public void interpretTemplateRules(StringBuffer grammarContent) throws IOException {
+        // Create an ANTLR input stream from the grammar content
+        CharStream input = CharStreams.fromString(grammarContent.toString());
 
+        // Create a lexer using the input stream
+        TemplateRulesLexer lexer = new TemplateRulesLexer(input);
+
+        // Create a token stream from the lexer
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        // Create a parser using the token stream
+        TemplateRulesParser parser = new TemplateRulesParser(tokens);
+
+        // Invoke the parser starting from the root rule
+        TemplateRulesDocumentContext tree = parser.templateRulesDocument();
+
+        // Implement your interpretation logic based on the parsed parse tree
+        // ...
+        // TODO Your interpretation logic goes here
+    }
     private String interpretInput(String inputFilePath) throws IOException, TemplateException {
         String inputXml = readFile(inputFilePath);
 

@@ -47,23 +47,35 @@ public interface TemplateRulesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTemplates(TemplateRulesParser.TemplatesContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TemplateRulesParser#namespaces}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNamespaces(TemplateRulesParser.NamespacesContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TemplateRulesParser#namespace}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNamespace(TemplateRulesParser.NamespaceContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TemplateRulesParser#sources}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSources(TemplateRulesParser.SourcesContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sinks}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSinks(TemplateRulesParser.SinksContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link TemplateRulesParser#source}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSource(TemplateRulesParser.SourceContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TemplateRulesParser#sinks}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSinks(TemplateRulesParser.SinksContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TemplateRulesParser#sink}.
 	 * @param ctx the parse tree
@@ -77,29 +89,11 @@ public interface TemplateRulesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMethod(TemplateRulesParser.MethodContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#replaceMethod}.
+	 * Visit a parse tree produced by {@link TemplateRulesParser#parameters}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitReplaceMethod(TemplateRulesParser.ReplaceMethodContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#match}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMatch(TemplateRulesParser.MatchContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#transformationMethod}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTransformationMethod(TemplateRulesParser.TransformationMethodContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#parameter}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitParameter(TemplateRulesParser.ParameterContext ctx);
+	T visitParameters(TemplateRulesParser.ParametersContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TemplateRulesParser#rules}.
 	 * @param ctx the parse tree
