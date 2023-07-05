@@ -16,6 +16,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.util.List;
 
 public class TemplateInterpreter {
 
@@ -66,7 +67,7 @@ public class TemplateInterpreter {
         HeaderAuthorListContext headerAuthorList = headerFields.headerAuthorList();
         HeaderDateContext headerDate = headerFields.headerDate();
         HeaderDescriptionContext headerDescription = headerFields.headerDescription();
-        
+        List<NamespaceContext> x = template.namespaces().get(0).namespace();
         // TODO finish this
     }
     private String interpretInput(String inputFilePath) throws IOException, TemplateException {

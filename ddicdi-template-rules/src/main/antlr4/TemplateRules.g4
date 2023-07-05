@@ -52,7 +52,7 @@ headerAuthorName: TEXT;
 headerAuthorEmail: EMAIL;
 headerDescription: TEXT;
 
-templates: 'templates' LBRACE namespaces+ sources+ sinks+ RBRACE;
+templates: 'templates' LBRACE namespaces sources sinks RBRACE;
 
 // A namespace contains a list of entities, or types. Here, shorthands for
 // namespaces are defined to shorten them to something reasonable, for example:
