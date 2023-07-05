@@ -63,6 +63,10 @@ public class TemplateInterpreter {
         
         HeaderFieldsContext headerFields = header.headerFields();
         HeaderNameContext headerName = headerFields.headerName();
+        HeaderAuthorListContext headerAuthorList = headerFields.headerAuthorList();
+        HeaderDateContext headerDate = headerFields.headerDate();
+        HeaderDescriptionContext headerDescription = headerFields.headerDescription();
+        
         // TODO finish this
     }
     private String interpretInput(String inputFilePath) throws IOException, TemplateException {
