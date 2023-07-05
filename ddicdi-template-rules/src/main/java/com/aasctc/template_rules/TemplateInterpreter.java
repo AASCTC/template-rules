@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.aasctc.template_rules.antlr.TemplateRulesLexer;
 import com.aasctc.template_rules.antlr.TemplateRulesParser;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.TemplateRulesDocumentContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.*;
 
 import net.sf.saxon.TransformerFactoryImpl;
 
@@ -57,6 +57,13 @@ public class TemplateInterpreter {
         // Implement your interpretation logic based on the parsed parse tree
         // ...
         // TODO Your interpretation logic goes here
+        HeaderContext header = tree.header();
+        TemplatesContext template = tree.templates();
+        RulesContext rules = tree.rules();
+        
+        HeaderFieldsContext headerFields = header.headerFields();
+        HeaderNameContext headerName = headerFields.headerName();
+        // TODO finish this
     }
     private String interpretInput(String inputFilePath) throws IOException, TemplateException {
         String inputXml = readFile(inputFilePath);

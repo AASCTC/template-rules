@@ -19,6 +19,9 @@ RBRACE: '}';
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 DATE: 'YYYY-mm-ddTHH:MM:SS';
 EMAIL: [a-zA-Z0-9_.+-]+ '@' ([a-zA-Z0-9-]+ '.')+ [a-zA-Z0-9-.]+;
+TRUE: 'true';
+FALSE: 'false';
+BOOLEAN: TRUE | FALSE;
 WS: [ \t\r\n]+ -> skip;
 
 // Added lexer rule for single-line comments starting with two slashes
@@ -32,15 +35,22 @@ templateRulesDocument: header templates rules;
 
 header: 'header' LBRACE headerFields RBRACE;
 
-headerFields: 'name' COLON IDENTIFIER
-              ('date' COLON DATE)?
-              ('author' COLON authorList)?
-              ('description' COLON TEXT)? ;
+headerFields: 'name' COLON headerName
+              ('date' COLON headerDate)?
+              ('author' COLON headerAuthorList)?
+              ('description' COLON headerDescription)? ;
 
-authorList: LBRACK (author (COMMA author)*)? RBRACK;
+headerName: IDENTIFIER;
+headerDate: DATE;
+headerAuthorList: LBRACK (headerAuthor (COMMA headerAuthor)*)? RBRACK;
 
-author: LBRACE 'name' COLON TEXT
-        ('email' COLON EMAIL)? RBRACE;
+headerAuthor: LBRACE 'name' COLON headerAuthorName
+        ('email' COLON headerAuthorEmail)? RBRACE;
+
+
+headerAuthorName: TEXT;
+headerAuthorEmail: EMAIL;
+headerDescription: TEXT;
 
 templates: 'templates' LBRACE namespaces+ sources+ sinks+ RBRACE;
 
@@ -49,8 +59,11 @@ templates: 'templates' LBRACE namespaces+ sources+ sinks+ RBRACE;
 // <http://xmlns.com/foaf/0.1/> to foaf: (do not include the colon)
 namespaces: 'namespaces' LBRACE namespace+ RBRACE;
 
-namespace: 'namespace' LBRACE 'name' COLON TEXT
-         'alias' COLON IDENTIFIER RBRACE;
+namespace: 'namespace' LBRACE 'name' COLON namespaceName
+         'alias' COLON namespaceAlias RBRACE;
+
+namespaceName: TEXT;
+namespaceAlias: TEXT;
 
 // Sources are elements which match a particular label. It should be specified
 // in the form of "namespace:label". For instance, foaf:name is valid (where foaf:
@@ -59,8 +72,11 @@ namespace: 'namespace' LBRACE 'name' COLON TEXT
 // so on. 
 sources: 'sources' LBRACE source+ RBRACE;
 
-source: 'source' LBRACE 'name' COLON TEXT
-         'label' COLON TEXT RBRACE;
+source: 'source' LBRACE 'name' COLON sourceName
+         'label' COLON sourceLabel RBRACE;
+
+sourceName: TEXT;
+sourceLabel: TEXT;
 
 // Sinks describe which label an element is turned into, and supplies a function
 // to do the transformation.
@@ -68,29 +84,40 @@ source: 'source' LBRACE 'name' COLON TEXT
 // value that is compatible with the output label.
 sinks: 'sinks' LBRACE sink+ RBRACE;
 
-sink: 'sink' LBRACE 'name' COLON TEXT 
-         'label' COLON TEXT
-         method RBRACE;
+sink: 'sink' LBRACE 'name' COLON sinkName 
+         'label' COLON sinkLabel
+         sinkMethod RBRACE;
+
+sinkName: TEXT;
+sinkLabel: TEXT;
 
 // The first parameter to the function is always the input element.
 // All parameters are passed as type "string", and conversion to
 // the appropriate type can be done within the compiler
-method: 'transform' COLON LBRACE 'name' COLON TEXT
-		 'parameters' COLON parameters RBRACE;
+sinkMethod: 'method' COLON LBRACE 'name' COLON sinkMethodName
+		 'parameters' COLON sinkMethodParameters RBRACE;
 
-parameters: LBRACK TEXT (COMMA TEXT)+ RBRACK;
+sinkMethodName: IDENTIFIER;
+
+sinkMethodParameters: LBRACK sinkMethodParameter (COMMA sinkMethodParameter)+ RBRACK;
+sinkMethodParameter: TEXT;
 
 // Rules describe a mapping between sources and sinks.
-// XSLT is used to convert one element into another element.
-// The script is converted into XSLT.
-// Rules also contain an xpath which is a way to specify where in the XML to insert
-// the generated element. Elements will always be appended after elements with identical
-// xpaths.
+// The location is a markup-neutral string that identifies where to find an element.
+// It could be an XPath, XQuery, or SPARQL for example.
+// There's also an option on whether to prune child elements, which must be explicitly
+// specified.
 rules: 'rules' LBRACE rule+ RBRACE;
 
-rule: 'rule' LBRACE 'path' COLON TEXT 
-					'source' COLON TEXT
-                    'sink' COLON TEXT RBRACE;
+rule: 'rule' LBRACE 'location' COLON ruleLocation 
+					'source' COLON ruleSource
+                    'sink' COLON ruleSink RBRACE
+                    'pruneChildren' COLON rulePruneChildren;
+
+ruleLocation: TEXT;
+ruleSource: IDENTIFIER;
+ruleSink: IDENTIFIER;
+rulePruneChildren: BOOLEAN;
 
 /*
 // Example DDI-CDI Template Rule
@@ -136,7 +163,7 @@ templates {
     sink {
       name: Sink1
       label: wd:Q2
-      transform: {
+      method: {
         name: method1
         parameters: [
           Param1,
@@ -160,14 +187,17 @@ templates {
 
 rules {
   rule {
-    xpath: root/element
+    // Pretend that it's XPath
+    location: root/element
     source: Source1
     sink: Sink1
+    pruneChildren: false
   }
   rule {
-    xpath: root/element2
+    location: root/element2
     source: Source2
     sink: Sink2
+    pruneChildren: false
   }
 }
 
