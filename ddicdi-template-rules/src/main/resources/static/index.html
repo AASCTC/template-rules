@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cross-Domain Template Rules Processor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      margin-top: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="file"] {
+      margin-bottom: 10px;
+    }
+    button {
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>File Processing</h1>
+  <form action="/process" method="POST" enctype="multipart/form-data">
+    <label for="inputFile">Input Files:</label>
+    <input type="file" name="inputFile" id="inputFile" multiple required>
+    <label for="ruleFile">Rule File:</label>
+    <input type="file" name="ruleFile" id="ruleFile" required>
+    <label for="outputFile">Output File:</label>
+    <input type="file" name="outputFile" id="outputFile" required>
+    <button type="submit">Process Files</button>
+  </form>
+</body>
+</html>

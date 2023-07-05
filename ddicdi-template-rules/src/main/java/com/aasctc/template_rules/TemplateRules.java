@@ -5,6 +5,7 @@ import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.springframework.boot.SpringApplication;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import net.sf.saxon.TransformerFactoryImpl;
@@ -44,6 +45,7 @@ public class TemplateRules {
         options.addOption("r", "rules", true, "Input template rules file");
         options.addOption("i", "input", true, "Input XML file, or directory path containing input XML files");
         options.addOption("o", "output", true, "Output XML file path");
+        options.addOption("s", "server", false, "Start the Spring Boot server");
 
         // Create the command-line parser
         CommandLineParser parser = new DefaultParser();
@@ -65,60 +67,69 @@ public class TemplateRules {
             }
 
             // Check if the required options are provided
-            if (!cmd.hasOption("i") || !cmd.hasOption("o") || !cmd.hasOption("r")) {
-                logger.error("Input, output, and rules options are required");
+            if (!(cmd.hasOption("s") ^
+            		(cmd.hasOption("i") &&
+            		 cmd.hasOption("o") &&
+            		 cmd.hasOption("r")))) {
+                logger.error("You must either specify --server, or --input, --output, and --rules");
                 printHelp(options);
                 return;
             }
             
-            // Get the file paths
-            String inputFilePath = cmd.getOptionValue("i");
-            String outputFilePath = cmd.getOptionValue("o");
-            String rulesFilePath = cmd.getOptionValue("r");
-
-            List<StringBuffer> fileContents = new ArrayList<>();
-            StringBuffer rulesContents = new StringBuffer();
-            
-            if (cmd.hasOption("input")) {
-                String inputDirectory = cmd.getOptionValue("input");
-                File directory = new File(inputDirectory);
-                
-                if (directory.isDirectory()) {
-                    File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".xml"));
-                    if (files != null) {
-                        for (File file : files) {
-                            try {
-                                fileContents.add(TemplateRules.processFileContents(file));
-                            } catch (IOException e) {
-                            	logger.error("Error reading input XML: {}", e.getMessage());
-                            }
-                        }
-
-                    }
-                } else {
-                    try {
-                        fileContents.add(TemplateRules.processFileContents(new File(inputFilePath)));
-                    } catch (IOException e) {
-                    	logger.error("Error reading input XML: {}", e.getMessage());
-                    }
-                }
+         // Check if the server option is present
+            if (cmd.hasOption("server")) {
+                // Start the Spring Boot server
+                SpringApplication.run(TemplateRulesServer.class, args);
             }
-            
-
-            try {
-                rulesContents = TemplateRules.processFileContents(new File(rulesFilePath));
-            } catch (IOException e) {
-            	logger.error("Error reading input XML: {}", e.getMessage());
+            else {
+	            // Get the file paths
+	            String inputFilePath = cmd.getOptionValue("i");
+	            String outputFilePath = cmd.getOptionValue("o");
+	            String rulesFilePath = cmd.getOptionValue("r");
+	
+	            List<StringBuffer> fileContents = new ArrayList<>();
+	            StringBuffer rulesContents = new StringBuffer();
+	            
+	            if (cmd.hasOption("input")) {
+	                String inputDirectory = cmd.getOptionValue("input");
+	                File directory = new File(inputDirectory);
+	                
+	                if (directory.isDirectory()) {
+	                    File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".xml"));
+	                    if (files != null) {
+	                        for (File file : files) {
+	                            try {
+	                                fileContents.add(TemplateRules.processFileContents(file));
+	                            } catch (IOException e) {
+	                            	logger.error("Error reading input XML: {}", e.getMessage());
+	                            }
+	                        }
+	
+	                    }
+	                } else {
+	                    try {
+	                        fileContents.add(TemplateRules.processFileContents(new File(inputFilePath)));
+	                    } catch (IOException e) {
+	                    	logger.error("Error reading input XML: {}", e.getMessage());
+	                    }
+	                }
+	            }
+	            
+	
+	            try {
+	                rulesContents = TemplateRules.processFileContents(new File(rulesFilePath));
+	            } catch (IOException e) {
+	            	logger.error("Error reading input XML: {}", e.getMessage());
+	            }
+	
+	            // Interpret the input XML and transform it to XSLT
+	            String xslt = interpretInput(inputFilePath);
+	
+	            // Transform the XML documents using SAXON
+	            transformXML(inputFilePath, outputFilePath, xslt);
+	
+	            logger.info("XML transformation completed successfully");
             }
-
-            // Interpret the input XML and transform it to XSLT
-            String xslt = interpretInput(inputFilePath);
-
-            // Transform the XML documents using SAXON
-            transformXML(inputFilePath, outputFilePath, xslt);
-
-            logger.info("XML transformation completed successfully");
-
         } catch (ParseException e) {
             logger.error("Error parsing command-line arguments: {}", e.getMessage());
             printHelp(options);
