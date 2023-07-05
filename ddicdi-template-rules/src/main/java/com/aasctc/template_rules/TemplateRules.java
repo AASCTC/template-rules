@@ -15,10 +15,24 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TemplateRules {
 
     private static final Logger logger = LogManager.getLogger(TemplateRules.class);
 
+    private static StringBuffer processFileContents(File inputFile) throws IOException {
+    	try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
+			StringBuffer content = new StringBuffer();
+			String line;
+			while ((line = reader.readLine()) != null) {
+			    content.append(line).append(System.lineSeparator());
+			}
+			return content;
+		}
+    }
+    
     public static void main(String[] args) {
         // Initialize Log4j with the configuration file
         Configurator.initialize(null, "log4j2.xml");
@@ -27,7 +41,8 @@ public class TemplateRules {
         Options options = new Options();
         options.addOption("h", "help", false, "Print the help message");
         options.addOption("v", "version", false, "Print the version information");
-        options.addOption("i", "input", true, "Input XML file path");
+        options.addOption("r", "rules", true, "Input template rules file");
+        options.addOption("i", "input", true, "Input XML file, or directory path containing input XML files");
         options.addOption("o", "output", true, "Output XML file path");
 
         // Create the command-line parser
@@ -49,16 +64,52 @@ public class TemplateRules {
                 return;
             }
 
-            // Check if the input and output options are provided
-            if (!cmd.hasOption("i") || !cmd.hasOption("o")) {
-                logger.error("Input and output options are required");
+            // Check if the required options are provided
+            if (!cmd.hasOption("i") || !cmd.hasOption("o") || !cmd.hasOption("r")) {
+                logger.error("Input, output, and rules options are required");
                 printHelp(options);
                 return;
             }
-
-            // Get the input and output file paths
+            
+            // Get the file paths
             String inputFilePath = cmd.getOptionValue("i");
             String outputFilePath = cmd.getOptionValue("o");
+            String rulesFilePath = cmd.getOptionValue("r");
+
+            List<StringBuffer> fileContents = new ArrayList<>();
+            StringBuffer rulesContents = new StringBuffer();
+            
+            if (cmd.hasOption("input")) {
+                String inputDirectory = cmd.getOptionValue("input");
+                File directory = new File(inputDirectory);
+                
+                if (directory.isDirectory()) {
+                    File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".xml"));
+                    if (files != null) {
+                        for (File file : files) {
+                            try {
+                                fileContents.add(TemplateRules.processFileContents(file));
+                            } catch (IOException e) {
+                            	logger.error("Error reading input XML: {}", e.getMessage());
+                            }
+                        }
+
+                    }
+                } else {
+                    try {
+                        fileContents.add(TemplateRules.processFileContents(new File(inputFilePath)));
+                    } catch (IOException e) {
+                    	logger.error("Error reading input XML: {}", e.getMessage());
+                    }
+                }
+            }
+            
+
+            try {
+                rulesContents = TemplateRules.processFileContents(new File(rulesFilePath));
+            } catch (IOException e) {
+            	logger.error("Error reading input XML: {}", e.getMessage());
+            }
 
             // Interpret the input XML and transform it to XSLT
             String xslt = interpretInput(inputFilePath);

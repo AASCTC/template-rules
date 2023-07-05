@@ -1,3 +1,9 @@
+// Markup for coupling structured documents in cross-domain.
+// Cross-domain basically means the document is applicable for
+// different kinds of applications.
+// This markup assumes the data is converted into structured data.
+// If not, you can use Jupyter notebooks and NLP for that purpose.
+
 grammar TemplateRules;
 
 // Lexer rules
@@ -36,40 +42,54 @@ authorList: LBRACK (author (COMMA author)*)? RBRACK;
 author: LBRACE 'name' COLON TEXT
         ('email' COLON EMAIL)? RBRACE;
 
-templates: 'templates' LBRACE sources+ sinks+ RBRACE;
+templates: 'templates' LBRACE namespaces+ sources+ sinks+ RBRACE;
 
-// Sources are input elements ("attributes") of a particular document ("category"),
-// both of which are well defined by schema vocabularies.
-// You can also specify child attributes if the parent attribute of a category is
-// a schema in its own write, separated by period (e.g. "student.age" of "University")
+// A namespace contains a list of entities, or types. Here, shorthands for
+// namespaces are defined to shorten them to something reasonable, for example:
+// <http://xmlns.com/foaf/0.1/> to foaf: (do not include the colon)
+namespaces: 'namespaces' LBRACE namespace+ RBRACE;
+
+namespace: 'namespace' LBRACE 'name' COLON TEXT
+         'alias' COLON IDENTIFIER RBRACE;
+
+// Sources are elements which match a particular label. It should be specified
+// in the form of "namespace:label". For instance, foaf:name is valid (where foaf:
+// is an alias), wd:Q1 is also valid, where wd: is shorthand for
+// <https://www.wikidata.org/entity/>, in other words the "Universe" entity, and
+// so on. 
 sources: 'sources' LBRACE source+ RBRACE;
 
-// Sinks describe transformations that are done to a particular element. They can
-// be a pattern matching transformation, or a function transformation (for complex
-// elements).
+source: 'source' LBRACE 'name' COLON TEXT
+         'label' COLON TEXT RBRACE;
+
+// Sinks describe which label an element is turned into, and supplies a function
+// to do the transformation.
+// The transformation function is supposed to turn the input label value into a
+// value that is compatible with the output label.
 sinks: 'sinks' LBRACE sink+ RBRACE;
 
-source: 'source' LBRACE 'name' COLON TEXT 'attribute' COLON TEXT
-         'category' COLON TEXT RBRACE;
+sink: 'sink' LBRACE 'name' COLON TEXT 
+         'label' COLON TEXT
+         method RBRACE;
 
-sink: 'sink' LBRACE 'name' COLON TEXT method RBRACE;
+// The first parameter to the function is always the input element.
+// All parameters are passed as type "string", and conversion to
+// the appropriate type can be done within the compiler
+method: 'transform' COLON LBRACE 'name' COLON TEXT
+		 'parameters' COLON parameters RBRACE;
 
-method: replaceMethod | transformationMethod;
-
-replaceMethod: 'findReplace' LBRACE match+ RBRACE;
-match: 'match' LBRACE 'search' COLON TEXT
-		       'replace' COLON TEXT RBRACE;
-		       
-transformationMethod: 'function' LBRACE 'name' COLON TEXT
-		       'parameters' COLON LBRACK parameter+ RBRACK RBRACE;
-
-parameter: LBRACK 'type' COLON TEXT 'value' COLON TEXT RBRACK;
+parameters: LBRACK TEXT (COMMA TEXT)+ RBRACK;
 
 // Rules describe a mapping between sources and sinks.
 // XSLT is used to convert one element into another element.
-rules: 'rules' LBRACE 'outputCategory' COLON IDENTIFIER rule+ RBRACE;
+// The script is converted into XSLT.
+// Rules also contain an xpath which is a way to specify where in the XML to insert
+// the generated element. Elements will always be appended after elements with identical
+// xpaths.
+rules: 'rules' LBRACE rule+ RBRACE;
 
-rule: 'rule' LBRACE 'source' COLON TEXT
+rule: 'rule' LBRACE 'path' COLON TEXT 
+					'source' COLON TEXT
                     'sink' COLON TEXT RBRACE;
 
 /*
@@ -80,8 +100,14 @@ header {
   name: Template Language
   date: 2023-06-12T10:30:00
   author: [
-    {name: "John Doe", email: "john.doe@example.com"},
-    {name: "Jane Smith", email: "jane.smith@example.com"}
+    {
+    	name: John Doe,
+    	email: john.doe@example.com
+    },
+    {
+    	name: Jane Smith,
+    	email: jane.smith@example.com
+    }
   ]
   
   // Comments can also be preceded by whitespace.
@@ -89,55 +115,59 @@ header {
 }
 
 templates {
+  namespaces {
+    namespace {
+      name: wd
+      alias: <https://www.wikidata.org/entity/>
+    }
+  }
   sources {
     source {
-      name: "Source 1"
-      attribute: "attribute1"
-      category: "Category1"
+      name: Source1
+      label: wd:Q1
     }
     source {
-      name: "Source 2"
-      attribute: "attribute2"
-      category: "Category2"
+      name: Source2
+      label: wd:Q42
     }
   }
   
   sinks {
     sink {
-      name: "Sink 1"
-      findReplace {
-        match {
-          search: "pattern1"
-          replace: "replacement1"
-        }
-        match {
-          search: "pattern2"
-          replace: "replacement2"
-        }
+      name: Sink1
+      label: wd:Q2
+      transform: {
+        name: method1
+        parameters: [
+          Param1,
+          Param2
+        ]
       }
     }
     sink {
-      name: "Sink 2"
-      function {
-        name: "transformMethod"
+      name: Sink2
+      label: wd:Q5
+      transform: {
+        name: method2
         parameters: [
-          [type: "paramType1", value: "paramValue1"],
-          [type: "paramType2", value: "paramValue2"]
+          Param1,
+          Param2
         ]
       }
     }
   }
-}
+
 
 rules {
-  outputCategory: OutputCategory1
   rule {
-    source: "Category1"
-    sink: "Sink 1"
+    xpath: root/element
+    source: Source1
+    sink: Sink1
   }
   rule {
-    source: "Category2"
-    sink: "Sink 2"
+    xpath: root/element2
+    source: Source2
+    sink: Sink2
   }
 }
 
