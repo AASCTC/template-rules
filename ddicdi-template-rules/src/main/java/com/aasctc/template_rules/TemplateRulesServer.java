@@ -1,33 +1,43 @@
 package com.aasctc.template_rules;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.web.servlet.ModelAndView;
 
-@SpringBootApplication
 @Controller
 public class TemplateRulesServer {
 
-    public static void main(String[] args) {
-        SpringApplication.run(TemplateRulesServer.class, args);
-    }
-
     @GetMapping("/")
-    public String index() {
-        return "index";
+    public ModelAndView showForm() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("index");
+        return modelAndView;
     }
 
-    @PostMapping("/process")
-    public String processParameters(@RequestParam("inputFiles") MultipartFile[] inputFiles, Model model) {
-        // Process the uploaded files and perform the desired operations
-        // You can access the input files using the inputFiles parameter
-        // Update the model with the result or any relevant information
-        
-        return "result";
+    @RequestMapping("/process")
+    public DeferredResult<String> processFiles(@RequestParam("inputFiles") MultipartFile[] inputFiles,
+                                               @RequestParam("rulesFile") MultipartFile rulesFile) {
+        DeferredResult<String> deferredResult = new DeferredResult<>();
+
+        // File processing logic here
+        // ...
+
+        // Complete the deferredResult and redirect to the result page
+        deferredResult.setResult("redirect:/result");
+
+        return deferredResult;
+    }
+
+    @GetMapping("/result")
+    public ModelAndView showResult() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("result");
+        return modelAndView;
     }
 }
