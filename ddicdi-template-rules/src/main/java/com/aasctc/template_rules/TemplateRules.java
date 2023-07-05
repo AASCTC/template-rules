@@ -71,7 +71,7 @@ public class TemplateRules {
             		(cmd.hasOption("i") &&
             		 cmd.hasOption("o") &&
             		 cmd.hasOption("r")))) {
-                logger.error("You must either specify --server, or --input, --output, and --rules");
+                logger.error("You must either specify --server, or all of --input, --output, and --rules.");
                 printHelp(options);
                 return;
             }
@@ -79,7 +79,9 @@ public class TemplateRules {
          // Check if the server option is present
             if (cmd.hasOption("server")) {
                 // Start the Spring Boot server
+            	logger.info("Starting web server...");
                 SpringApplication.run(TemplateRulesServer.class, args);
+                logger.info("Web server has stopped.");
             }
             else {
 	            // Get the file paths
