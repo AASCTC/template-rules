@@ -4,14 +4,76 @@
 package com.aasctc.template_rules;
 
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
+
+import javax.xml.xpath.XPath;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+
+import com.aasctc.template_rules.antlr.TemplateRulesLexer;
+import com.aasctc.template_rules.antlr.TemplateRulesParser;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderAuthorListContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderDateContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderDescriptionContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderFieldsContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderNameContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.NamespaceContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.RulesContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.TemplateRulesDocumentContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.TemplatesContext;
 
 /**
  * @author Ali Sherief
  *
  */
-public interface TemplateRulesGrammar {
+public class TemplateRulesGrammar {
+	
+	List<Author> authors;
+	String name;
+	LocalDateTime date;
+	String description;
+	List<Namespace> namespaces;
+	public List<Source> sources;
+	public List<Sink> sinks;
+	public List<Rule> rules;
+	
+	public TemplateRulesGrammar(StringBuffer grammarContent) {
+        // Create an ANTLR input stream from the grammar content
+        CharStream input = CharStreams.fromString(grammarContent.toString());
+
+        // Create a lexer using the input stream
+        TemplateRulesLexer lexer = new TemplateRulesLexer(input);
+
+        // Create a token stream from the lexer
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        // Create a parser using the token stream
+        TemplateRulesParser parser = new TemplateRulesParser(tokens);
+
+        // Invoke the parser starting from the root rule
+        TemplateRulesDocumentContext tree = parser.templateRulesDocument();
+
+        // Implement your interpretation logic based on the parsed parse tree
+        // ...
+        // TODO Your interpretation logic goes here
+        HeaderContext header = tree.header();
+        TemplatesContext template = tree.templates();
+        RulesContext rules = tree.rules();
+        
+        HeaderFieldsContext headerFields = header.headerFields();
+        HeaderNameContext headerName = headerFields.headerName();
+        HeaderAuthorListContext headerAuthorList = headerFields.headerAuthorList();
+        HeaderDateContext headerDate = headerFields.headerDate();
+        HeaderDescriptionContext headerDescription = headerFields.headerDescription();
+        //List<NamespaceContext> x = template.namespaces().get(0).namespace();
+        // TODO finish this
+	}
+	
 	public class Author {
 		String name;
 		String email;
@@ -44,26 +106,50 @@ public interface TemplateRulesGrammar {
 	} 
 	
 	public class Type {
-		String schema;
+		Namespace namespace;
 		String label;
 		public Type() {
-			schema = "";
+			namespace = new Namespace();
 			label = "";
 		}
-		public Type(String inputSchema, String inputLabel) {
-			schema = inputSchema;
+		public Type(Namespace inputNamespace, String inputLabel) {
+			namespace = inputNamespace;
 			label = inputLabel;
 		}
 		
-		// I hate this exception type but I'm on a time crunch.
+		// Uses the list of namespaces in parent class to determine the
+		// type denoted in the prefix.
 		public Type(String input) throws Exception {
+			namespace = new Namespace();
 			String[] inputs = input.split(":");
 			if (inputs.length != 2) {
 				throw new Exception();
 			}
-			schema = inputs[0];
+			for (Namespace n: namespaces) {
+				if (n.name == inputs[0] || n.alias == inputs[0]) {
+					namespace = n;
+				}
+			}
+			if (namespace == new Namespace()) {
+				throw new Exception(); //TODO make better exception.
+			}
 			label = inputs[1];
 			
+		}
+	}
+	
+	public class Source {
+		String name;
+		Type label;
+		
+		public Source() {
+			name = "";
+			label = new Type();
+		}
+		
+		public Source(String inputName, Type inputLabel) {
+			name = inputName;
+			label = inputLabel;
 		}
 	}
 	
@@ -86,28 +172,55 @@ public interface TemplateRulesGrammar {
 		}
 	}
 	
-	public class Element {
+	public class Sink {
 		String name;
-		Type type;
-		public Element() {
+		Type label;
+		Method method;
+		
+		public Sink() {
 			name = "";
-			type = new Type();
+			label = new Type();
+			method = new Method();
 		}
-		public Element(String inputName, Type inputType) {
+		
+		public Sink(String inputName, Type inputLabel, Method inputMethod) {
 			name = inputName;
-			type = inputType;
+			label = inputLabel;
+			method = inputMethod;
 		}
-	} 
+	}
 	
-	public String name();
-	public Map<String, String> authors();
-	public String date();
-	public String description();
-	public List<Namespace> namespaces();
-	public List<Element> sources();
-	public List<Map<Element, Method>> sinks();
-	//TODO make method and classes for rules()
+	public abstract class Rule {
+		Source source;
+		Sink sink;
+		String location;
+		Boolean pruneChildren;
+
+		public Rule() {
+			source = new Source();
+			sink = new Sink();
+			location = new String();
+			pruneChildren = false;
+		}
+	}
 	
-	
-	
+	public class XMLRule extends Rule {
+		XPath xmlLocation;
+		public XMLRule() {
+			source = new Source();
+			sink = new Sink();
+			location = new String();
+			//xmlLocation = new XPath(); //FIXME I don't think you can init this class.
+			pruneChildren = false;
+		}
+		
+		public XMLRule(Source inputSource, Sink inputSink, XPath inputXmlLocation,
+				Boolean inputPruneChildren) {
+			source = inputSource;
+			sink = inputSink;
+			xmlLocation = inputXmlLocation;
+			//TODO figure out how to get a String out of an XPath
+			pruneChildren = inputPruneChildren;
+		}
+	}	
 }

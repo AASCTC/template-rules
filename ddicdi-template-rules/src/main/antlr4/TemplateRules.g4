@@ -174,7 +174,7 @@ templates {
     sink {
       name: Sink2
       label: wd:Q5
-      transform: {
+      method: {
         name: method2
         parameters: [
           Param1,
