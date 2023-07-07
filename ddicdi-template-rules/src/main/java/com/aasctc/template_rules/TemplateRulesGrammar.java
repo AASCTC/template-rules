@@ -6,9 +6,8 @@ package com.aasctc.template_rules;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Map;
-
-import javax.xml.xpath.XPath;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -16,16 +15,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import com.aasctc.template_rules.antlr.TemplateRulesLexer;
 import com.aasctc.template_rules.antlr.TemplateRulesParser;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderAuthorListContext;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderContext;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderDateContext;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderDescriptionContext;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderFieldsContext;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.HeaderNameContext;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.NamespaceContext;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.RulesContext;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.TemplateRulesDocumentContext;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.TemplatesContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.*;
 
 /**
  * @author Ali Sherief
@@ -42,7 +32,7 @@ public class TemplateRulesGrammar {
 	public List<Sink> sinks;
 	public List<Rule> rules;
 	
-	public TemplateRulesGrammar(StringBuffer grammarContent) {
+	public TemplateRulesGrammar(StringBuffer grammarContent) throws Exception, NoSuchElementException {
         // Create an ANTLR input stream from the grammar content
         CharStream input = CharStreams.fromString(grammarContent.toString());
 
@@ -59,19 +49,81 @@ public class TemplateRulesGrammar {
         TemplateRulesDocumentContext tree = parser.templateRulesDocument();
 
         // Implement your interpretation logic based on the parsed parse tree
-        // ...
-        // TODO Your interpretation logic goes here
         HeaderContext header = tree.header();
         TemplatesContext template = tree.templates();
         RulesContext rules = tree.rules();
         
         HeaderFieldsContext headerFields = header.headerFields();
-        HeaderNameContext headerName = headerFields.headerName();
-        HeaderAuthorListContext headerAuthorList = headerFields.headerAuthorList();
-        HeaderDateContext headerDate = headerFields.headerDate();
-        HeaderDescriptionContext headerDescription = headerFields.headerDescription();
-        //List<NamespaceContext> x = template.namespaces().get(0).namespace();
-        // TODO finish this
+        name = headerFields.headerName().getText();
+        date = LocalDateTime.parse(headerFields.headerDate().getText());
+        description = headerFields.headerDescription().getText();
+
+        for (HeaderAuthorContext author: headerFields.headerAuthorList().headerAuthor()) {
+        	authors.add(new Author(
+        			author.headerAuthorName().getText(),
+        			author.headerAuthorEmail().getText()));
+        }
+        
+        for (NamespaceContext namespace: template.namespaces().namespace()) {
+        	namespaces.add(new Namespace(
+        			namespace.namespaceName().getText(),
+        			namespace.namespaceAlias().getText()));
+        }
+        
+        for (SourceContext source: template.sources().source()) {        	
+        	try {
+        		Type t = new Type(source.sourceLabel().getText()); 
+				sources.add(new Source(
+						source.sourceName().getText(), t));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw e;
+			}
+        }
+        
+        for (SinkContext sink: template.sinks().sink()) {
+        	try {
+        		Type t = new Type(sink.sinkLabel().getText());
+        		SinkMethodContext method = sink.sinkMethod();
+        		List<String> parameters = new ArrayList<String>();
+        				method.sinkMethodParameters().sinkMethodParameter().forEach(
+        						parameter -> parameters.add(parameter.getText()));
+        		Method m = new Method(method.sinkMethodName().getText(), parameters);
+        		sinks.add(new Sink(sink.sinkName().getText(), t, m));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw e;
+			}
+        }
+        
+        List<Rule> targetRules = new ArrayList<Rule>();
+        for (RuleContext rule: rules.rule_()) {
+        	String location = rule.ruleLocation().getText();
+        	String source = rule.ruleSource().getText();
+        	String sink = rule.ruleSink().getText();
+        	Boolean pruneChildren = Boolean.valueOf(rule.rulePruneChildren().getText());
+        	
+        	
+        	// Now find the appropriate source and sink respectively
+			Optional<Source> optionalSource = Optional.empty();
+        	for (Source inputSource: sources) {
+        		if (inputSource.name == source) {
+        			optionalSource = Optional.of(inputSource);
+        			break;
+        		}
+        	}
+			Optional<Sink> optionalSink = Optional.empty();
+        	for (Sink inputSink: sinks) {
+        		if (inputSink.name == sink) {
+        			optionalSink = Optional.of(inputSink);
+        			break;
+        		}
+        	}
+        	targetRules.add(new Rule(optionalSource.get(), optionalSink.get(),
+        			location, pruneChildren));
+        }
 	}
 	
 	public class Author {
@@ -190,7 +242,7 @@ public class TemplateRulesGrammar {
 		}
 	}
 	
-	public abstract class Rule {
+	public class Rule {
 		Source source;
 		Sink sink;
 		String location;
@@ -202,25 +254,13 @@ public class TemplateRulesGrammar {
 			location = new String();
 			pruneChildren = false;
 		}
-	}
-	
-	public class XMLRule extends Rule {
-		XPath xmlLocation;
-		public XMLRule() {
-			source = new Source();
-			sink = new Sink();
-			location = new String();
-			//xmlLocation = new XPath(); //FIXME I don't think you can init this class.
-			pruneChildren = false;
-		}
 		
-		public XMLRule(Source inputSource, Sink inputSink, XPath inputXmlLocation,
+		public Rule(Source inputSource, Sink inputSink, String inputLocation,
 				Boolean inputPruneChildren) {
 			source = inputSource;
 			sink = inputSink;
-			xmlLocation = inputXmlLocation;
-			//TODO figure out how to get a String out of an XPath
+			location = inputLocation;
 			pruneChildren = inputPruneChildren;
 		}
-	}	
+	}
 }
