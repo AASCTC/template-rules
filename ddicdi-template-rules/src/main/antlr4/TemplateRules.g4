@@ -30,31 +30,31 @@ COMMENT: '//' ~[\r\n]* -> skip;
 // Combined lexer rule for regular text and comments
 TEXT: (~[\r\n])+;
 
+
 methodProgram: methodStatement+;
 
 methodStatement: methodAssignment
                | methodExpression
                | methodConditional
-               | forEachLoop
+               | methodForEachLoop
+               | methodReturn
                ;
 
 methodAssignment: type ID '=' methodExpression ';';
 
+methodReturn: 'return' methodExpression ';';
+
 methodExpression: methodPrimaryExpression
-                | methodUnaryExpression
-                | methodBinaryExpression
                 | methodFunctionCall
                 | methodPropertyAccess
                 ;
 
 methodPrimaryExpression: INT
+                       | FLOAT
+                       | STRING
                        | ID
                        | '(' methodExpression ')'
                        ;
-
-methodUnaryExpression: unaryOperator methodExpression;
-
-methodBinaryExpression: methodExpression binaryOperator methodExpression;
 
 methodFunctionCall: ID '(' methodArgumentList? ')';
 
@@ -70,24 +70,22 @@ methodElseIfBlock: 'else' 'if' '(' methodExpression ')' '{' methodStatement+ '}'
 
 methodElseBlock: 'else' '{' methodStatement+ '}';
 
-forEachLoop: 'foreach' '(' ID ':' methodRange ')' '{' methodStatement+ '}';
+methodForEachLoop: 'foreach' '(' ID ':' methodRange ')' '{' methodStatement+ '}';
 
 methodRange: INT '..' INT;
-
-unaryOperator: '-';
-
-binaryOperator: '+' | '-' | '*' | '/' | '%';
 
 type: (ID | '<' URI '>') ':' ID;
 
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 
+//FIXME This is very bad way to write URI rule!
 URI: ~[<>]+;
 
 INT: [0-9]+;
 
-WS: [ \t\r\n]+ -> skip;
+FLOAT: INT '.' INT;
 
+STRING: '"' TEXT '"' ;
 
 // Parser rules
 templateRulesDocument: header templates rules;
@@ -154,12 +152,15 @@ sinkLabel: TEXT;
 // All parameters are passed as type "string", and conversion to
 // the appropriate type can be done within the compiler
 sinkMethod: 'method' COLON LBRACE 'name' COLON sinkMethodName
-		 'parameters' COLON sinkMethodParameters RBRACE;
+		 'parameters' COLON sinkMethodParameters
+		 'program' COLON LBRACE methodProgram RBRACE RBRACE;
 
 sinkMethodName: IDENTIFIER;
 
 sinkMethodParameters: LBRACK sinkMethodParameter (COMMA sinkMethodParameter)+ RBRACK;
-sinkMethodParameter: TEXT;
+sinkMethodParameter: sinkMethodParameterType sinkMethodParameterValue;
+sinkMethodParameterType: TEXT;
+sinkMethodParameterValue: TEXT;
 
 // Rules describe a mapping between sources and sinks.
 // The location is a markup-neutral string that identifies where to find an element.
