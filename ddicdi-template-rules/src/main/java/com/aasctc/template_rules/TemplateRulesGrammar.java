@@ -32,7 +32,8 @@ public class TemplateRulesGrammar {
 	public List<Sink> sinks;
 	public List<Rule> rules;
 	
-	public TemplateRulesGrammar(StringBuffer grammarContent) throws Exception, NoSuchElementException {
+	public TemplateRulesGrammar(StringBuffer grammarContent)
+			throws UnknownNamespaceException, IllegalArgumentException, NoSuchElementException {
         // Create an ANTLR input stream from the grammar content
         CharStream input = CharStreams.fromString(grammarContent.toString());
 
@@ -75,8 +76,10 @@ public class TemplateRulesGrammar {
         		Type t = new Type(source.sourceLabel().getText()); 
 				sources.add(new Source(
 						source.sourceName().getText(), t));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+				throw e;
+			} catch (UnknownNamespaceException e) {
 				e.printStackTrace();
 				throw e;
 			}
@@ -91,8 +94,10 @@ public class TemplateRulesGrammar {
         						parameter -> parameters.add(parameter.getText()));
         		Method m = new Method(method.sinkMethodName().getText(), parameters);
         		sinks.add(new Sink(sink.sinkName().getText(), t, m));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+				throw e;
+			} catch (UnknownNamespaceException e) {
 				e.printStackTrace();
 				throw e;
 			}
@@ -104,7 +109,6 @@ public class TemplateRulesGrammar {
         	String source = rule.ruleSource().getText();
         	String sink = rule.ruleSink().getText();
         	Boolean pruneChildren = Boolean.valueOf(rule.rulePruneChildren().getText());
-        	
         	
         	// Now find the appropriate source and sink respectively
 			Optional<Source> optionalSource = Optional.empty();
@@ -171,11 +175,11 @@ public class TemplateRulesGrammar {
 		
 		// Uses the list of namespaces in parent class to determine the
 		// type denoted in the prefix.
-		public Type(String input) throws Exception {
+		public Type(String input) throws UnknownNamespaceException {
 			namespace = new Namespace();
 			String[] inputs = input.split(":");
 			if (inputs.length != 2) {
-				throw new Exception();
+				throw new IllegalArgumentException();
 			}
 			for (Namespace n: namespaces) {
 				if (n.name == inputs[0] || n.alias == inputs[0]) {
@@ -183,7 +187,7 @@ public class TemplateRulesGrammar {
 				}
 			}
 			if (namespace == new Namespace()) {
-				throw new Exception(); //TODO make better exception.
+				throw new UnknownNamespaceException();
 			}
 			label = inputs[1];
 			
@@ -205,9 +209,12 @@ public class TemplateRulesGrammar {
 		}
 	}
 	
+	//FIXME this has got to support types. But I am not sure how to
+	//define allowed operations for each type.
 	public class Method {
 		String name;
 		List<String> parameters;
+		//String body; //TODO how will this work?
 		
 		public Method() {
 			name = "";

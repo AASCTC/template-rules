@@ -30,6 +30,65 @@ COMMENT: '//' ~[\r\n]* -> skip;
 // Combined lexer rule for regular text and comments
 TEXT: (~[\r\n])+;
 
+methodProgram: methodStatement+;
+
+methodStatement: methodAssignment
+               | methodExpression
+               | methodConditional
+               | forEachLoop
+               ;
+
+methodAssignment: type ID '=' methodExpression ';';
+
+methodExpression: methodPrimaryExpression
+                | methodUnaryExpression
+                | methodBinaryExpression
+                | methodFunctionCall
+                | methodPropertyAccess
+                ;
+
+methodPrimaryExpression: INT
+                       | ID
+                       | '(' methodExpression ')'
+                       ;
+
+methodUnaryExpression: unaryOperator methodExpression;
+
+methodBinaryExpression: methodExpression binaryOperator methodExpression;
+
+methodFunctionCall: ID '(' methodArgumentList? ')';
+
+methodArgumentList: methodExpression (',' methodExpression)*;
+
+methodPropertyAccess: ID ('.' ID)+;
+
+methodConditional: methodIfBlock (methodElseIfBlock)* (methodElseBlock)?;
+
+methodIfBlock: 'if' '(' methodExpression ')' '{' methodStatement+ '}';
+
+methodElseIfBlock: 'else' 'if' '(' methodExpression ')' '{' methodStatement+ '}';
+
+methodElseBlock: 'else' '{' methodStatement+ '}';
+
+forEachLoop: 'foreach' '(' ID ':' methodRange ')' '{' methodStatement+ '}';
+
+methodRange: INT '..' INT;
+
+unaryOperator: '-';
+
+binaryOperator: '+' | '-' | '*' | '/' | '%';
+
+type: (ID | '<' URI '>') ':' ID;
+
+ID: [a-zA-Z_][a-zA-Z0-9_]*;
+
+URI: ~[<>]+;
+
+INT: [0-9]+;
+
+WS: [ \t\r\n]+ -> skip;
+
+
 // Parser rules
 templateRulesDocument: header templates rules;
 
