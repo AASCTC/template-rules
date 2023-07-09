@@ -196,10 +196,13 @@ public class Method {
 				if (typeString2 == "xsd:byte") {
 					return false;
 				}
-				else if (typeString2 == "xsd:long") {
+				else if (typeString2 == "xsd:int" ||
+						typeString2 == "xsd:long" ||
+						typeString2 == "xsd:integer" ||
+						typeString2 == "xsd:float" ||
+						typeString2 == "xsd:double" ||
+						typeString2 == "xsd:decimal") {
 					return true;
-					//TODO this needs to include ALL integer types as well
-					//as decimal types.
 				}
 			}
 			else if (typeString1 == "xsd:int") {
@@ -207,7 +210,13 @@ public class Method {
 						typeString2 == "xsd:short") {
 					return false;
 				}
-				else return true;
+				else if (typeString2 == "xsd:long" ||
+						typeString2 == "xsd:integer" ||
+						typeString2 == "xsd:float" ||
+						typeString2 == "xsd:double" ||
+						typeString2 == "xsd:decimal") {
+					return true;
+				}
 			}
 			else if (typeString1 == "xsd:long") {
 				if (typeString2 == "xsd:byte" ||
@@ -215,8 +224,142 @@ public class Method {
 						typeString2 == "xsd:int") {
 					return false;
 				}
-				else return true;
+
+				else if (typeString2 == "xsd:integer" ||
+						typeString2 == "xsd:float" ||
+						typeString2 == "xsd:double" ||
+						typeString2 == "xsd:decimal") {
+					return true;
+				}
 			}
+			else if (typeString1 == "xsd:float") {
+				if (typeString2 == "xsd:byte" ||
+					typeString2 == "xsd:short" ||
+					typeString2 == "xsd:int" ||
+					typeString2 == "xsd:long" ||
+					typeString2 == "xsd:unsignedByte" ||
+					typeString2 == "xsd:unsignedShort" ||
+					typeString2 == "xsd:unsignedInt" ||
+					typeString2 == "xsd:unsignedLong" ||
+					typeString2 == "xsd:integer") {
+					return false;
+				}
+
+				else if (typeString2 == "xsd:double" ||
+						typeString2 == "xsd:decimal") {
+					return true;
+				}
+			}
+			else if (typeString1 == "xsd:double") {
+				if (typeString2 == "xsd:byte" ||
+					typeString2 == "xsd:short" ||
+					typeString2 == "xsd:int" ||
+					typeString2 == "xsd:long" ||
+					typeString2 == "xsd:unsignedByte" ||
+					typeString2 == "xsd:unsignedShort" ||
+					typeString2 == "xsd:unsignedInt" ||
+					typeString2 == "xsd:unsignedLong" ||
+					typeString2 == "xsd:integer" ||
+					typeString2 == "xsd:float") {
+					return false;
+				}
+
+				else if (typeString2 == "xsd:decimal") {
+					return true;
+				}
+			}
+			else if (typeString1 == "xsd:decimal") {
+				if (typeString2 == "xsd:byte" ||
+					typeString2 == "xsd:short" ||
+					typeString2 == "xsd:int" ||
+					typeString2 == "xsd:long" ||
+					typeString2 == "xsd:unsignedByte" ||
+					typeString2 == "xsd:unsignedShort" ||
+					typeString2 == "xsd:unsignedInt" ||
+					typeString2 == "xsd:unsignedLong" ||
+					typeString2 == "xsd:integer" ||
+					typeString2 == "xsd:float") {
+					return false;
+				}
+				else return false;
+			}
+			else if (typeString1 == "xsd:unsignedByte") {
+				return false; 
+			}
+			else if (typeString1 == "xsd:unsignedShort") {
+				if (typeString2 == "xsd:unsignedByte") {
+					return false;
+				}
+				else if (typeString2 == "xsd:unsignedInt" ||
+						typeString2 == "xsd:unsignedLong" ||
+						typeString2 == "xsd:nonNegativeInteger" ||
+						typeString2 == "xsd:positiveInteger" ||
+						typeString2 == "xsd:integer" ||
+						typeString2 == "xsd:float" ||
+						typeString2 == "xsd:double" ||
+						typeString2 == "xsd:decimal") {
+					return true;
+				}
+			}
+			else if (typeString1 == "xsd:unsignedInt") {
+				if (typeString2 == "xsd:unsignedByte" ||
+						typeString2 == "xsd:unsignedShort") {
+					return false;
+				}
+				else if (typeString2 == "xsd:unsignedLong" ||
+						typeString2 == "xsd:nonNegativeInteger" ||
+						typeString2 == "xsd:positiveInteger" ||
+						typeString2 == "xsd:integer" ||
+						typeString2 == "xsd:float" ||
+						typeString2 == "xsd:double" ||
+						typeString2 == "xsd:decimal") {
+					return true;
+				}
+			}
+			else if (typeString1 == "xsd:unsignedLong") {
+				if (typeString2 == "xsd:unsignedByte" ||
+						typeString2 == "xsd:unsignedShort" ||
+						typeString2 == "xsd:unsignedInt") {
+					return false;
+				}
+				else if (typeString2 == "xsd:nonNegativeInteger" ||
+						typeString2 == "xsd:positiveInteger" ||
+						typeString2 == "xsd:integer" ||
+						typeString2 == "xsd:float" ||
+						typeString2 == "xsd:double" ||
+						typeString2 == "xsd:decimal") {
+					return true;
+				}
+			}
+			else if (typeString1 == "xsd:nonNegativeInteger") {
+				if (typeString2 == "xsd:unsignedByte" ||
+						typeString2 == "xsd:unsignedShort" ||
+						typeString2 == "xsd:unsignedInt" ||
+						typeString2 == "xsd:unsignedLong") {
+					return false;
+				}
+				else if (typeString2 == "xsd:integer" ||
+						typeString2 == "xsd:float" ||
+						typeString2 == "xsd:double" ||
+						typeString2 == "xsd:decimal") {
+					return true;
+				}
+			}
+			else if (typeString1 == "xsd:positiveInteger") {
+				if (typeString2 == "xsd:unsignedByte" ||
+						typeString2 == "xsd:unsignedShort" ||
+						typeString2 == "xsd:unsignedInt" ||
+						typeString2 == "xsd:unsignedLong") {
+					return false;
+				}
+				else if (typeString2 == "xsd:integer" ||
+						typeString2 == "xsd:float" ||
+						typeString2 == "xsd:double" ||
+						typeString2 == "xsd:decimal") {
+					return true;
+				}
+			}
+			else return false;
 		}
 		
 		public static Pair<Type, String> function_add(
