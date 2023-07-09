@@ -45,7 +45,11 @@ public class Method {
 				"sub",
 				"mul",
 				"div",
-				"mod"
+				"mod",
+				"append",
+				"index",
+				"delete",
+				"deleteAll"
 		};
 		
 		/**
@@ -405,6 +409,15 @@ public class Method {
 				return new Type(type1.namespace, "xsd:integer");
 			}
 			
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:positiveInteger" ||
+					typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:nonPositiveInteger");
+			}
+			else if (typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:nonNegativeInteger" ||
+					typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:negativeInteger") {
+				return new Type(type1.namespace, "xsd:nonNegativeInteger");
+			}
+			
 
 			else if (typeString1 == "xsd:integer" && typeString2 == "xsd:decimal" ||
 					typeString1 == "xsd:decimal" && typeString2 == "xsd:integer") {
@@ -602,7 +615,7 @@ public class Method {
 		
 		public static Pair<Type, String> function_add(
 				Pair<Type, String> op,
-				Pair<Type, String> op2) {
+				Pair<Type, String> op2) throws IllegalArgumentException {
 			if (MethodProgram.isRealNumber(op.getValue0()) &&
 					MethodProgram.isRealNumber(op2.getValue0())) {
 				String result = new BigDecimal(op.getValue1()).add(
@@ -613,6 +626,119 @@ public class Method {
 								op.getValue0(), op.getValue0()),
 								result));
 				return new Pair<Type, String>(resultType, result);
+			}
+			else {
+				throw new IllegalArgumentException("This function is only valid for numerical types.");
+			}
+		}
+		
+		public static Pair<Type, String> function_sub(
+				Pair<Type, String> op,
+				Pair<Type, String> op2) throws IllegalArgumentException {
+			if (MethodProgram.isRealNumber(op.getValue0()) &&
+					MethodProgram.isRealNumber(op2.getValue0())) {
+				String result = new BigDecimal(op.getValue1()).subtract(
+						new BigDecimal(op2.getValue1())).toString();
+				
+				Type resultType = MethodProgram.upgradeNumericalStorage(
+						new Pair<Type, String>(MethodProgram.resultType(
+								op.getValue0(), op.getValue0()),
+								result));
+				return new Pair<Type, String>(resultType, result);
+			}
+			else {
+				throw new IllegalArgumentException("This function is only valid for numerical types.");
+			}
+		}
+		
+		public static Pair<Type, String> function_mul(
+				Pair<Type, String> op,
+				Pair<Type, String> op2) throws IllegalArgumentException {
+			if (MethodProgram.isRealNumber(op.getValue0()) &&
+					MethodProgram.isRealNumber(op2.getValue0())) {
+				String result = new BigDecimal(op.getValue1()).multiply(
+						new BigDecimal(op2.getValue1())).toString();
+				
+				Type resultType = MethodProgram.upgradeNumericalStorage(
+						new Pair<Type, String>(MethodProgram.resultType(
+								op.getValue0(), op.getValue0()),
+								result));
+				return new Pair<Type, String>(resultType, result);
+			}
+			else {
+				throw new IllegalArgumentException("This function is only valid for numerical types.");
+			}
+		}
+		
+		public static Pair<Type, String> function_div(
+				Pair<Type, String> op,
+				Pair<Type, String> op2) throws IllegalArgumentException {
+			try {
+				if (MethodProgram.isRealNumber(op.getValue0()) &&
+						MethodProgram.isRealNumber(op2.getValue0())) {
+					String result = new BigDecimal(op.getValue1()).divide(
+							new BigDecimal(op2.getValue1())).toString();
+					
+					Type resultType = MethodProgram.upgradeNumericalStorage(
+							new Pair<Type, String>(MethodProgram.resultType(
+									op.getValue0(), op.getValue0()),
+									result));
+					return new Pair<Type, String>(resultType, result);
+				}
+				else {
+					throw new IllegalArgumentException("This function is only valid for numerical types.");
+				}
+			}
+			catch (ArithmeticException e) {
+				throw new IllegalArgumentException("Numerical division error");
+			}
+		}
+		
+		public static Pair<Type, String> function_div(
+				Pair<Type, String> op,
+				Pair<Type, String> op2) throws IllegalArgumentException {
+			try {
+				if (MethodProgram.isIntegerNumber(op.getValue0()) &&
+						MethodProgram.isIntegerNumber(op2.getValue0())) {
+					String result = new BigDecimal(op.getValue1()).divide(
+							new BigDecimal(op2.getValue1())).toString();
+					
+					Type resultType = MethodProgram.upgradeNumericalStorage(
+							new Pair<Type, String>(MethodProgram.resultType(
+									op.getValue0(), op.getValue0()),
+									result));
+					return new Pair<Type, String>(resultType, result);
+				}
+				else {
+					throw new IllegalArgumentException("This function is only valid for numerical types.");
+				}
+			}
+			catch (ArithmeticException e) {
+				throw new IllegalArgumentException("Numerical modulus error");
+			}
+		}
+		
+		public static Pair<Type, String> function_div(
+				Pair<Type, String> op,
+				Pair<Type, String> op2) throws IllegalArgumentException {
+			try {
+				if (MethodProgram.isIntegerNumber(op.getValue0()) &&
+						MethodProgram.isIntegerNumber(op2.getValue0())) {
+					String result = new BigDecimal(op.getValue1()).divide(
+							new BigDecimal(op2.getValue1())).toString();
+					
+					Type resultType = MethodProgram.upgradeNumericalStorage(
+							new Pair<Type, String>(MethodProgram.resultType(
+									op.getValue0(), op.getValue0()),
+									result));
+					return new Pair<Type, String>(resultType, result);
+				}
+				else {
+					throw new IllegalArgumentException("This function is only valid for numerical types.");
+				}
+			}
+			catch (ArithmeticException e) {
+				throw new IllegalArgumentException("Numerical modulus error");
 			}
 		}
 		
