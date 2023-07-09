@@ -33,16 +33,16 @@ TEXT: (~[\r\n])+;
 
 methodProgram: methodStatement+;
 
-methodStatement: methodAssignment
-               | methodExpression
+methodStatement: (methodAssignment ';')
+               | (methodExpression ';')
                | methodConditional
                | methodForEachLoop
-               | methodReturn
+               | (methodReturn ';')
                ;
 
-methodAssignment: type ID '=' methodExpression ';';
+methodAssignment: ID '->' methodType '=' methodExpression;
 
-methodReturn: 'return' methodExpression ';';
+methodReturn: 'return' methodExpression;
 
 methodExpression: methodPrimaryExpression
                 | methodFunctionCall
@@ -74,11 +74,10 @@ methodForEachLoop: 'foreach' '(' ID ':' methodRange ')' '{' methodStatement+ '}'
 
 methodRange: INT '..' INT;
 
-type: (ID | '<' URI '>') ':' ID;
+methodType: (ID | '<' URI '>') ':' ID;
 
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 
-//FIXME This is very bad way to write URI rule!
 URI: ~[<>]+;
 
 INT: [0-9]+;
@@ -109,7 +108,7 @@ headerAuthorName: TEXT;
 headerAuthorEmail: EMAIL;
 headerDescription: TEXT;
 
-templates: 'templates' LBRACE namespaces sources sinks RBRACE;
+templates: 'templates' LBRACE namespaces methods RBRACE;
 
 // A namespace contains a list of entities, or types. Here, shorthands for
 // namespaces are defined to shorten them to something reasonable, for example:
@@ -122,62 +121,41 @@ namespace: 'namespace' LBRACE 'name' COLON namespaceName
 namespaceName: TEXT;
 namespaceAlias: TEXT;
 
-// Sources are elements which match a particular label. It should be specified
-// in the form of "namespace:label". For instance, foaf:name is valid (where foaf:
-// is an alias), wd:Q1 is also valid, where wd: is shorthand for
-// <https://www.wikidata.org/entity/>, in other words the "Universe" entity, and
-// so on. 
-sources: 'sources' LBRACE source+ RBRACE;
+// Types should be specified in the form of "namespace:label". For instance,
+// foaf:name is valid (where foaf: is an alias), wd:Q1 is also valid, where wd:
+// is shorthand for <https://www.wikidata.org/entity/>, in other words the
+// "Universe" entity, and so on. 
 
-source: 'source' LBRACE 'name' COLON sourceName
-         'label' COLON sourceLabel RBRACE;
-
-sourceName: TEXT;
-sourceLabel: TEXT;
-
-// Sinks describe which label an element is turned into, and supplies a function
-// to do the transformation.
-// The transformation function is supposed to turn the input label value into a
-// value that is compatible with the output label.
-sinks: 'sinks' LBRACE sink+ RBRACE;
-
-sink: 'sink' LBRACE 'name' COLON sinkName 
-         'label' COLON sinkLabel
-         sinkMethod RBRACE;
-
-sinkName: TEXT;
-sinkLabel: TEXT;
-
-// The first parameter to the function is always the input element.
-// All parameters are passed as type "string", and conversion to
-// the appropriate type can be done within the compiler
-sinkMethod: 'method' COLON LBRACE 'name' COLON sinkMethodName
-		 'parameters' COLON sinkMethodParameters
+// An element matching the input type at a particular location is sent into a
+// method that transforms it into another data type.
+// Multiple parameters are supported - the first parameter to the function is
+// always the input element.
+// The method itself is written in a custom domain-specific-language (DSL) that
+// resembles C, or GoLang.
+methods: 'methods' LBRACE method+ RBRACE;
+method: 'method' COLON LBRACE 'name' COLON methodName
+         'type' COLON methodType
+		 'parameters' COLON methodParameters
 		 'program' COLON LBRACE methodProgram RBRACE RBRACE;
 
-sinkMethodName: IDENTIFIER;
+methodName: IDENTIFIER;
 
-sinkMethodParameters: LBRACK sinkMethodParameter (COMMA sinkMethodParameter)+ RBRACK;
-sinkMethodParameter: sinkMethodParameterType sinkMethodParameterValue;
-sinkMethodParameterType: TEXT;
-sinkMethodParameterValue: TEXT;
+methodParameters: LBRACK methodParameter (COMMA methodParameter)+ RBRACK;
+methodParameter: methodParameterValue '->' methodParameterType;
+methodParameterType: TEXT;
+methodParameterValue: TEXT;
 
-// Rules describe a mapping between sources and sinks.
+// Rules describe a transformation of an element at a particular location.
 // The location is a markup-neutral string that identifies where to find an element.
-// It could be an XPath, XQuery, or SPARQL for example.
-// There's also an option on whether to prune child elements, which must be explicitly
-// specified.
+// It could be an XPath, or jq for example.
 rules: 'rules' LBRACE rule+ RBRACE;
 
-rule: 'rule' LBRACE 'location' COLON ruleLocation 
-					'source' COLON ruleSource
-                    'sink' COLON ruleSink RBRACE
-                    'pruneChildren' COLON rulePruneChildren;
+rule: 'rule' LBRACE 'location' COLON ruleLocation
+					'outputElement' COLON ruleOutputElement 
+					'method' COLON method RBRACE;
 
 ruleLocation: TEXT;
-ruleSource: IDENTIFIER;
-ruleSink: IDENTIFIER;
-rulePruneChildren: BOOLEAN;
+ruleOutputElement: IDENTIFIER;
 
 /*
 // Example DDI-CDI Template Rule
@@ -207,57 +185,45 @@ templates {
       name: wd
       alias: <https://www.wikidata.org/entity/>
     }
-  }
-  sources {
-    source {
-      name: Source1
-      label: wd:Q1
-    }
-    source {
-      name: Source2
-      label: wd:Q42
+    namespace {
+      name: xsd
+      alias: <https://www.w3.org/2001/XMLSchema#>
     }
   }
-  
-  sinks {
-    sink {
-      name: Sink1
-      label: wd:Q2
-      method: {
-        name: method1
-        parameters: [
-          Param1,
-          Param2
-        ]
+  methods {
+    method {
+      name: method1
+      type: xsd:string // this is type for the "input" variable
+      parameters: [
+        constant -> xsd:int,
+        constant2 -> xsd:double
+      ]
+      program: {
+        prunechildren(input);
+        a -> xsd:string = "Replaced input";
+        return a;
       }
     }
-    sink {
-      name: Sink2
-      label: wd:Q5
-      method: {
-        name: method2
-        parameters: [
-          Param1,
-          Param2
-        ]
+    method {
+      name: method2
+      type: xsd:int
+      parameters: []
+      program: {
+        return add(input, 2);
       }
     }
   }
-
 
 rules {
   rule {
-    // Pretend that it's XPath
-    location: root/element
-    source: Source1
-    sink: Sink1
-    pruneChildren: false
+    location: /element
+    outputElement: a
+	method: method1
   }
   rule {
-    location: root/element2
-    source: Source2
-    sink: Sink2
-    pruneChildren: false
+    location: /element2
+    outputElement: aMoreDescriptiveName
+    method: method2
   }
 }
 

@@ -71,6 +71,8 @@ public class TemplateRulesGrammar {
         			namespace.namespaceAlias().getText()));
         }
         
+        //TODO get rid of source and sink. Update Method class
+        //to process the method language.
         for (SourceContext source: template.sources().source()) {        	
         	try {
         		Type t = new Type(source.sourceLabel().getText()); 

@@ -101,11 +101,11 @@ public interface TemplateRulesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMethodRange(TemplateRulesParser.MethodRangeContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#type}.
+	 * Visit a parse tree produced by {@link TemplateRulesParser#methodType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitType(TemplateRulesParser.TypeContext ctx);
+	T visitMethodType(TemplateRulesParser.MethodTypeContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TemplateRulesParser#templateRulesDocument}.
 	 * @param ctx the parse tree
@@ -197,89 +197,47 @@ public interface TemplateRulesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNamespaceAlias(TemplateRulesParser.NamespaceAliasContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sources}.
+	 * Visit a parse tree produced by {@link TemplateRulesParser#methods}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSources(TemplateRulesParser.SourcesContext ctx);
+	T visitMethods(TemplateRulesParser.MethodsContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#source}.
+	 * Visit a parse tree produced by {@link TemplateRulesParser#method}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSource(TemplateRulesParser.SourceContext ctx);
+	T visitMethod(TemplateRulesParser.MethodContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sourceName}.
+	 * Visit a parse tree produced by {@link TemplateRulesParser#methodName}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSourceName(TemplateRulesParser.SourceNameContext ctx);
+	T visitMethodName(TemplateRulesParser.MethodNameContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sourceLabel}.
+	 * Visit a parse tree produced by {@link TemplateRulesParser#methodParameters}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSourceLabel(TemplateRulesParser.SourceLabelContext ctx);
+	T visitMethodParameters(TemplateRulesParser.MethodParametersContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sinks}.
+	 * Visit a parse tree produced by {@link TemplateRulesParser#methodParameter}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSinks(TemplateRulesParser.SinksContext ctx);
+	T visitMethodParameter(TemplateRulesParser.MethodParameterContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sink}.
+	 * Visit a parse tree produced by {@link TemplateRulesParser#methodParameterType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSink(TemplateRulesParser.SinkContext ctx);
+	T visitMethodParameterType(TemplateRulesParser.MethodParameterTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sinkName}.
+	 * Visit a parse tree produced by {@link TemplateRulesParser#methodParameterValue}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSinkName(TemplateRulesParser.SinkNameContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sinkLabel}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSinkLabel(TemplateRulesParser.SinkLabelContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sinkMethod}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSinkMethod(TemplateRulesParser.SinkMethodContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sinkMethodName}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSinkMethodName(TemplateRulesParser.SinkMethodNameContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sinkMethodParameters}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSinkMethodParameters(TemplateRulesParser.SinkMethodParametersContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sinkMethodParameter}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSinkMethodParameter(TemplateRulesParser.SinkMethodParameterContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sinkMethodParameterType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSinkMethodParameterType(TemplateRulesParser.SinkMethodParameterTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#sinkMethodParameterValue}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSinkMethodParameterValue(TemplateRulesParser.SinkMethodParameterValueContext ctx);
+	T visitMethodParameterValue(TemplateRulesParser.MethodParameterValueContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TemplateRulesParser#rules}.
 	 * @param ctx the parse tree
@@ -299,21 +257,9 @@ public interface TemplateRulesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRuleLocation(TemplateRulesParser.RuleLocationContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#ruleSource}.
+	 * Visit a parse tree produced by {@link TemplateRulesParser#ruleOutputElement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRuleSource(TemplateRulesParser.RuleSourceContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#ruleSink}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRuleSink(TemplateRulesParser.RuleSinkContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TemplateRulesParser#rulePruneChildren}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRulePruneChildren(TemplateRulesParser.RulePruneChildrenContext ctx);
+	T visitRuleOutputElement(TemplateRulesParser.RuleOutputElementContext ctx);
 }

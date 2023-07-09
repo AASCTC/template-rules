@@ -2,6 +2,8 @@
 package com.aasctc.template_rules.antlr;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
+import com.aasctc.template_rules.antlr.TemplateRulesParser;
+
 /**
  * This class provides an empty implementation of {@link TemplateRulesVisitor},
  * which can be extended to create a visitor which only needs to handle a subset
@@ -123,7 +125,7 @@ public class TemplateRulesBaseVisitor<T> extends AbstractParseTreeVisitor<T> imp
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitType(TemplateRulesParser.TypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMethodType(TemplateRulesParser.MethodTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -235,98 +237,49 @@ public class TemplateRulesBaseVisitor<T> extends AbstractParseTreeVisitor<T> imp
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSources(TemplateRulesParser.SourcesContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMethods(TemplateRulesParser.MethodsContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSource(TemplateRulesParser.SourceContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMethod(TemplateRulesParser.MethodContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSourceName(TemplateRulesParser.SourceNameContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMethodName(TemplateRulesParser.MethodNameContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSourceLabel(TemplateRulesParser.SourceLabelContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMethodParameters(TemplateRulesParser.MethodParametersContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSinks(TemplateRulesParser.SinksContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMethodParameter(TemplateRulesParser.MethodParameterContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSink(TemplateRulesParser.SinkContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMethodParameterType(TemplateRulesParser.MethodParameterTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSinkName(TemplateRulesParser.SinkNameContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitSinkLabel(TemplateRulesParser.SinkLabelContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitSinkMethod(TemplateRulesParser.SinkMethodContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitSinkMethodName(TemplateRulesParser.SinkMethodNameContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitSinkMethodParameters(TemplateRulesParser.SinkMethodParametersContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitSinkMethodParameter(TemplateRulesParser.SinkMethodParameterContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitSinkMethodParameterType(TemplateRulesParser.SinkMethodParameterTypeContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitSinkMethodParameterValue(TemplateRulesParser.SinkMethodParameterValueContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMethodParameterValue(TemplateRulesParser.MethodParameterValueContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -354,19 +307,5 @@ public class TemplateRulesBaseVisitor<T> extends AbstractParseTreeVisitor<T> imp
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRuleSource(TemplateRulesParser.RuleSourceContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitRuleSink(TemplateRulesParser.RuleSinkContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitRulePruneChildren(TemplateRulesParser.RulePruneChildrenContext ctx) { return visitChildren(ctx); }
+	@Override public T visitRuleOutputElement(TemplateRulesParser.RuleOutputElementContext ctx) { return visitChildren(ctx); }
 }
