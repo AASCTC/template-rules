@@ -185,6 +185,235 @@ public class Method {
 					typeString == "xsd:decimal";
 		}
 		
+		
+
+		
+		public static Type resultType(Type type1, Type type2) throws IllegalArgumentException {
+			String typeString1 = type1.toString(false);
+			String typeString2 = type2.toString(false);
+			if (type2 == type1) {
+				return type1;
+			}
+			else if (MethodProgram.lessThan(type1, type2)) {
+				return type1;
+			}
+			
+			else if (MethodProgram.lessThan(type2, type1)) {
+				return type2;
+			}
+			else if (typeString1 == "xsd:byte" && typeString2 == "xsd:unsignedByte" ||
+					typeString1 == "xsd:unsignedByte" && typeString2 == "xsd:byte") {
+				return new Type(type1.namespace, "xsd:short");
+			}
+			else if (typeString1 == "xsd:short" && typeString2 == "xsd:unsignedShort" ||
+					typeString1 == "xsd:unsignedShort" && typeString2 == "xsd:short") {
+				return new Type(type1.namespace, "xsd:int");
+			}
+			else if (typeString1 == "xsd:int" && typeString2 == "xsd:unsignedInt" ||
+					typeString1 == "xsd:unsignedInt" && typeString2 == "xsd:int") {
+				return new Type(type1.namespace, "xsd:long");
+			}
+			else if (typeString1 == "xsd:long" && typeString2 == "xsd:unsignedLong" ||
+					typeString1 == "xsd:unsignedLong" && typeString2 == "xsd:long") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:negativeInteger" ||
+					typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:nonNegativeInteger" ||
+					typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:negativeInteger" ||
+					typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:positiveInteger" ||
+					typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:nonPositiveInteger" ||
+					typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:nonNegativeInteger" ||
+					typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:nonPositiveInteger" ||
+					typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:integer" ||
+					typeString1 == "xsd:integer" && typeString2 == "xsd:nonNegativeInteger" ||
+					typeString1 == "xsd:integer" && typeString2 == "xsd:negativeInteger" ||
+					typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:integer" ||
+					typeString1 == "xsd:integer" && typeString2 == "xsd:nonPositiveInteger" ||
+					typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:integer" ||
+					typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:integer" ||
+					typeString1 == "xsd:integer" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:decimal" ||
+					typeString1 == "xsd:decimal" && typeString2 == "xsd:nonNegativeInteger" ||
+					typeString1 == "xsd:decimal" && typeString2 == "xsd:negativeInteger" ||
+					typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:decimal" ||
+					typeString1 == "xsd:decimal" && typeString2 == "xsd:nonPositiveInteger" ||
+					typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:decimal" ||
+					typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:decimal" ||
+					typeString1 == "xsd:decimal" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:decimal");
+			}
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:float" ||
+					typeString1 == "xsd:float" && typeString2 == "xsd:nonNegativeInteger" ||
+					typeString1 == "xsd:float" && typeString2 == "xsd:negativeInteger" ||
+					typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:float" ||
+					typeString1 == "xsd:float" && typeString2 == "xsd:nonPositiveInteger" ||
+					typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:float" ||
+					typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:float" ||
+					typeString1 == "xsd:float" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:decimal");
+			}
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:double" ||
+					typeString1 == "xsd:double" && typeString2 == "xsd:nonNegativeInteger" ||
+					typeString1 == "xsd:double" && typeString2 == "xsd:negativeInteger" ||
+					typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:double" ||
+					typeString1 == "xsd:double" && typeString2 == "xsd:nonPositiveInteger" ||
+					typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:double" ||
+					typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:double" ||
+					typeString1 == "xsd:double" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:decimal");
+			}
+			
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:unsignedLong" ||
+					typeString1 == "xsd:unsignedLong" && typeString2 == "xsd:nonNegativeInteger") {
+				return new Type(type1.namespace, "xsd:nonNegativeInteger");
+			}
+			else if (typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:unsignedLong" ||
+					typeString1 == "xsd:unsignedLong" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:positiveInteger");
+			}
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedLong" ||
+					typeString1 == "xsd:unsignedLong" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:unsignedLong" ||
+					typeString1 == "xsd:unsignedLong" && typeString2 == "xsd:negativeInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:unsignedInt" ||
+					typeString1 == "xsd:unsignedInt" && typeString2 == "xsd:nonNegativeInteger") {
+				return new Type(type1.namespace, "xsd:nonNegativeInteger");
+			}
+			else if (typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:unsignedInt" ||
+					typeString1 == "xsd:unsignedInt" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:positiveInteger");
+			}
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedInt" ||
+					typeString1 == "xsd:unsignedInt" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:unsignedInt" ||
+					typeString1 == "xsd:unsignedInt" && typeString2 == "xsd:negativeInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:unsignedShort" ||
+					typeString1 == "xsd:unsignedShort" && typeString2 == "xsd:nonNegativeInteger") {
+				return new Type(type1.namespace, "xsd:nonNegativeInteger");
+			}
+			else if (typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:unsignedShort" ||
+					typeString1 == "xsd:unsignedShort" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:positiveInteger");
+			}
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedShort" ||
+					typeString1 == "xsd:unsignedShort" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:unsignedShort" ||
+					typeString1 == "xsd:unsignedShort" && typeString2 == "xsd:negativeInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:unsignedByte" ||
+					typeString1 == "xsd:unsignedByte" && typeString2 == "xsd:nonNegativeInteger") {
+				return new Type(type1.namespace, "xsd:nonNegativeInteger");
+			}
+			else if (typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:unsignedByte" ||
+					typeString1 == "xsd:unsignedByte" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:positiveInteger");
+			}
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedByte" ||
+					typeString1 == "xsd:unsignedByte" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:unsignedByte" ||
+					typeString1 == "xsd:unsignedByte" && typeString2 == "xsd:negativeInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+
+			
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedLong" ||
+					typeString1 == "xsd:unsignedLong" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:unsignedLong" ||
+					typeString1 == "xsd:unsignedLong" && typeString2 == "xsd:negativeInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedLong" ||
+					typeString1 == "xsd:unsignedLong" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:unsignedLong" ||
+					typeString1 == "xsd:unsignedLong" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:unsignedInt" ||
+					typeString1 == "xsd:unsignedInt" && typeString2 == "xsd:nonNegativeInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:unsignedInt" ||
+					typeString1 == "xsd:unsignedInt" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedInt" ||
+					typeString1 == "xsd:unsignedInt" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:nonNegativeInteger" && typeString2 == "xsd:unsignedInt" ||
+					typeString1 == "xsd:unsignedInt" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedShort" ||
+					typeString1 == "xsd:unsignedShort" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:positiveInteger" && typeString2 == "xsd:unsignedShort" ||
+					typeString1 == "xsd:unsignedShort" && typeString2 == "xsd:positiveInteger") {
+				return new Type(type1.namespace, "xsd:positiveInteger");
+			}
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedShort" ||
+					typeString1 == "xsd:unsignedShort" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:unsignedShort" ||
+					typeString1 == "xsd:unsignedShort" && typeString2 == "xsd:negativeInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedByte" ||
+					typeString1 == "xsd:unsignedByte" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:unsignedByte" ||
+					typeString1 == "xsd:unsignedByte" && typeString2 == "xsd:negativeInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:nonPositiveInteger" && typeString2 == "xsd:unsignedByte" ||
+					typeString1 == "xsd:unsignedByte" && typeString2 == "xsd:nonPositiveInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			else if (typeString1 == "xsd:negativeInteger" && typeString2 == "xsd:unsignedByte" ||
+					typeString1 == "xsd:unsignedByte" && typeString2 == "xsd:negativeInteger") {
+				return new Type(type1.namespace, "xsd:integer");
+			}
+			
+
+			else if (typeString1 == "xsd:integer" && typeString2 == "xsd:decimal" ||
+					typeString1 == "xsd:decimal" && typeString2 == "xsd:integer") {
+				return new Type(type1.namespace, "xsd:decimal");
+			}
+			
+			throw new IllegalArgumentException("Only integer types are allowed");
+		}
+		
 		public static Boolean lessThan(Type type1, Type type2) {
 			String typeString1 = type1.toString(false);
 			String typeString2 = type2.toString(false);
@@ -287,11 +516,14 @@ public class Method {
 				return false; 
 			}
 			else if (typeString1 == "xsd:unsignedShort") {
-				if (typeString2 == "xsd:unsignedByte") {
+				if (typeString2 == "xsd:unsignedByte" ||
+					typeString2 == "xsd:byte") {
 					return false;
 				}
 				else if (typeString2 == "xsd:unsignedInt" ||
+						typeString2 == "xsd:int" ||
 						typeString2 == "xsd:unsignedLong" ||
+						typeString2 == "xsd:long" ||
 						typeString2 == "xsd:nonNegativeInteger" ||
 						typeString2 == "xsd:positiveInteger" ||
 						typeString2 == "xsd:integer" ||
@@ -303,10 +535,13 @@ public class Method {
 			}
 			else if (typeString1 == "xsd:unsignedInt") {
 				if (typeString2 == "xsd:unsignedByte" ||
-						typeString2 == "xsd:unsignedShort") {
+						typeString2 == "xsd:byte" ||
+						typeString2 == "xsd:unsignedShort" ||
+						typeString2 == "xsd:short") {
 					return false;
 				}
 				else if (typeString2 == "xsd:unsignedLong" ||
+						typeString2 == "xsd:long" ||
 						typeString2 == "xsd:nonNegativeInteger" ||
 						typeString2 == "xsd:positiveInteger" ||
 						typeString2 == "xsd:integer" ||
@@ -318,8 +553,11 @@ public class Method {
 			}
 			else if (typeString1 == "xsd:unsignedLong") {
 				if (typeString2 == "xsd:unsignedByte" ||
+						typeString2 == "xsd:byte" ||
 						typeString2 == "xsd:unsignedShort" ||
-						typeString2 == "xsd:unsignedInt") {
+						typeString2 == "xsd:short" ||
+						typeString2 == "xsd:unsignedInt" ||
+						typeString2 == "xsd:int") {
 					return false;
 				}
 				else if (typeString2 == "xsd:nonNegativeInteger" ||
@@ -369,9 +607,12 @@ public class Method {
 					MethodProgram.isRealNumber(op2.getValue0())) {
 				String result = new BigDecimal(op.getValue1()).add(
 						new BigDecimal(op2.getValue1())).toString();
-				return new Pair<Type, String>(
-						MethodProgram.upgradeNumericalStorage()
 				
+				Type resultType = MethodProgram.upgradeNumericalStorage(
+						new Pair<Type, String>(MethodProgram.resultType(
+								op.getValue0(), op.getValue0()),
+								result));
+				return new Pair<Type, String>(resultType, result);
 			}
 		}
 		
