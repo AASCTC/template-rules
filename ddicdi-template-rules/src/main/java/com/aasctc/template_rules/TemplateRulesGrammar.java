@@ -28,8 +28,7 @@ public class TemplateRulesGrammar {
 	LocalDateTime date;
 	String description;
 	List<Namespace> namespaces;
-	public List<Source> sources;
-	public List<Sink> sinks;
+	public List<Method> methods;
 	public List<Rule> rules;
 	
 	public TemplateRulesGrammar(StringBuffer grammarContent)
@@ -132,69 +131,6 @@ public class TemplateRulesGrammar {
         }
 	}
 	
-	public class Author {
-		String name;
-		String email;
-		public Author() {
-			name = "";
-			email = "";
-		}
-		public Author(String inputName, String inputEmail) {
-			name = inputName;
-			email = inputEmail;
-		}
-	}
-
-	public class Namespace {
-		String name;
-		String alias;
-		public Namespace() {
-			name = "";
-			alias = "";
-		}
-		public Namespace(String inputName, String inputAlias) {
-			name = inputName;
-			alias = inputAlias;
-		}
-		
-		public Namespace(String inputName) {
-			name = inputName;
-			alias = inputName;
-		}
-	} 
-	
-	public class Type {
-		Namespace namespace;
-		String label;
-		public Type() {
-			namespace = new Namespace();
-			label = "";
-		}
-		public Type(Namespace inputNamespace, String inputLabel) {
-			namespace = inputNamespace;
-			label = inputLabel;
-		}
-		
-		// Uses the list of namespaces in parent class to determine the
-		// type denoted in the prefix.
-		public Type(String input) throws UnknownNamespaceException {
-			namespace = new Namespace();
-			String[] inputs = input.split(":");
-			if (inputs.length != 2) {
-				throw new IllegalArgumentException();
-			}
-			for (Namespace n: namespaces) {
-				if (n.name == inputs[0] || n.alias == inputs[0]) {
-					namespace = n;
-				}
-			}
-			if (namespace == new Namespace()) {
-				throw new UnknownNamespaceException();
-			}
-			label = inputs[1];
-			
-		}
-	}
 	
 	public class Source {
 		String name;
