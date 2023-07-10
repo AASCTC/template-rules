@@ -16,6 +16,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import com.aasctc.template_rules.antlr.TemplateRulesLexer;
 import com.aasctc.template_rules.antlr.TemplateRulesParser;
 import com.aasctc.template_rules.antlr.TemplateRulesParser.*;
+import com.aasctc.template_rules.methods.XMLMethodProgram;
 
 /**
  * @author Ali Sherief
@@ -28,7 +29,7 @@ public class TemplateRulesGrammar {
 	LocalDateTime date;
 	String description;
 	List<Namespace> namespaces;
-	public List<Method> methods;
+	public List<XMLMethod> methods;
 	public List<Rule> rules;
 	
 	public TemplateRulesGrammar(StringBuffer grammarContent)
@@ -70,31 +71,16 @@ public class TemplateRulesGrammar {
         			namespace.namespaceAlias().getText()));
         }
         
-        //TODO get rid of source and sink. Update Method class
-        //to process the method language.
-        for (SourceContext source: template.sources().source()) {        	
+        for (MethodContext method: template.methods().method()) {        	
         	try {
-        		Type t = new Type(source.sourceLabel().getText()); 
-				sources.add(new Source(
-						source.sourceName().getText(), t));
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-				throw e;
-			} catch (UnknownNamespaceException e) {
-				e.printStackTrace();
-				throw e;
-			}
-        }
-        
-        for (SinkContext sink: template.sinks().sink()) {
-        	try {
-        		Type t = new Type(sink.sinkLabel().getText());
-        		SinkMethodContext method = sink.sinkMethod();
+        		Type t = new Type(method.methodType().getText(), namespaces);
         		List<String> parameters = new ArrayList<String>();
-        				method.sinkMethodParameters().sinkMethodParameter().forEach(
-        						parameter -> parameters.add(parameter.getText()));
-        		Method m = new Method(method.sinkMethodName().getText(), parameters);
-        		sinks.add(new Sink(sink.sinkName().getText(), t, m));
+				method.methodParameters().methodParameter().forEach(
+						parameter -> parameters.add(parameter.getText()));
+
+				methods.add(new XMLMethod(
+						method.methodName().getText(), t,
+						parameters, new XMLMethodProgram(method.methodProgram())));
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 				throw e;
@@ -107,105 +93,21 @@ public class TemplateRulesGrammar {
         List<Rule> targetRules = new ArrayList<Rule>();
         for (RuleContext rule: rules.rule_()) {
         	String location = rule.ruleLocation().getText();
-        	String source = rule.ruleSource().getText();
-        	String sink = rule.ruleSink().getText();
-        	Boolean pruneChildren = Boolean.valueOf(rule.rulePruneChildren().getText());
+        	String methodName = rule.method().getText();
+			
+        	Optional<XMLMethod> optionalMethod = Optional.empty();
+        	for (XMLMethod method: methods) {
+        		if (method.name == methodName) {
+        			optionalMethod = Optional.of(method);
+        			break;
+        		}
+        	}
         	
-        	// Now find the appropriate source and sink respectively
-			Optional<Source> optionalSource = Optional.empty();
-        	for (Source inputSource: sources) {
-        		if (inputSource.name == source) {
-        			optionalSource = Optional.of(inputSource);
-        			break;
-        		}
-        	}
-			Optional<Sink> optionalSink = Optional.empty();
-        	for (Sink inputSink: sinks) {
-        		if (inputSink.name == sink) {
-        			optionalSink = Optional.of(inputSink);
-        			break;
-        		}
-        	}
-        	targetRules.add(new Rule(optionalSource.get(), optionalSink.get(),
-        			location, pruneChildren));
+        	String outputElement = rule.ruleOutputElement().getText();
+        	
+        	targetRules.add(new Rule(outputElement, optionalMethod.get(), location));
         }
 	}
 	
 	
-	public class Source {
-		String name;
-		Type label;
-		
-		public Source() {
-			name = "";
-			label = new Type();
-		}
-		
-		public Source(String inputName, Type inputLabel) {
-			name = inputName;
-			label = inputLabel;
-		}
-	}
-	
-	//FIXME this has got to support types. But I am not sure how to
-	//define allowed operations for each type.
-	public class Method {
-		String name;
-		List<String> parameters;
-		//String body; //TODO how will this work?
-		
-		public Method() {
-			name = "";
-			parameters = new ArrayList<String>();
-		}
-		public Method(String inputName, List<String> inputParameters) {
-			name = inputName;
-			parameters = inputParameters;
-		}
-		
-		public Method(String inputName) {
-			name = inputName;
-			parameters = new ArrayList<String>();
-		}
-	}
-	
-	public class Sink {
-		String name;
-		Type label;
-		Method method;
-		
-		public Sink() {
-			name = "";
-			label = new Type();
-			method = new Method();
-		}
-		
-		public Sink(String inputName, Type inputLabel, Method inputMethod) {
-			name = inputName;
-			label = inputLabel;
-			method = inputMethod;
-		}
-	}
-	
-	public class Rule {
-		Source source;
-		Sink sink;
-		String location;
-		Boolean pruneChildren;
-
-		public Rule() {
-			source = new Source();
-			sink = new Sink();
-			location = new String();
-			pruneChildren = false;
-		}
-		
-		public Rule(Source inputSource, Sink inputSink, String inputLocation,
-				Boolean inputPruneChildren) {
-			source = inputSource;
-			sink = inputSink;
-			location = inputLocation;
-			pruneChildren = inputPruneChildren;
-		}
-	}
 }

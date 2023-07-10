@@ -733,13 +733,11 @@ public class MethodProgram {
 			// We should not be doing this. We have to consider this as XML and
 			// extract the first node.
 			String result = String.valueOf(op.getValue1().charAt(index));
+			return new Pair<Type, String>(op.getValue0(), result);
 		}
 		catch(NumberFormatException | IndexOutOfBoundsException e) {
 			throw new IllegalArgumentException("Bad array index");
 		}
-		String result = op.getValue1() + op2.getValue1();
-		
-		return new Pair<Type, String>(op.getValue0(), result);
 	}
 
 	public static Pair<Type, String> function_delete(
@@ -767,5 +765,9 @@ public class MethodProgram {
 		for (MethodStatementContext statement: statements) {
 			String text = statement.getText();
 		}
+	}
+
+	public MethodProgram() {
+		// TODO Auto-generated constructor stub
 	}
 }

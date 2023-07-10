@@ -8,8 +8,9 @@ import com.aasctc.template_rules.methods.MethodProgram;
 public class Method {
 	
 	String name;
+	Type type;
 	List<String> parameters;
-	MethodProgram body;
+	MethodProgram program;
 	
 	public class Variable {
 		String name;
@@ -29,13 +30,17 @@ public class Method {
 		name = "";
 		parameters = new ArrayList<String>();
 	}
-	public Method(String inputName, List<String> inputParameters) {
+	public Method(String inputName, Type inputType,
+			List<String> inputParameters, MethodProgram inputProgram) {
 		name = inputName;
+		type = inputType;
 		parameters = inputParameters;
+		program = inputProgram;
 	}
 	
 	public Method(String inputName) {
 		name = inputName;
 		parameters = new ArrayList<String>();
+		program = new MethodProgram();
 	}
 }
