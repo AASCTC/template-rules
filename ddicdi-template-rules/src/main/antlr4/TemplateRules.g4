@@ -40,7 +40,7 @@ methodStatement: (methodAssignment ';')
                | (methodReturn ';')
                ;
 
-methodAssignment: ID '->' methodType '=' methodExpression;
+methodAssignment: IDENTIFIER '->' methodType '=' methodExpression;
 
 methodReturn: 'return' methodExpression;
 
@@ -52,15 +52,15 @@ methodExpression: methodPrimaryExpression
 methodPrimaryExpression: INT
                        | FLOAT
                        | STRING
-                       | ID
+                       | IDENTIFIER
                        | '(' methodExpression ')'
                        ;
 
-methodFunctionCall: ID '(' methodArgumentList? ')';
+methodFunctionCall: IDENTIFIER '(' methodArgumentList? ')';
 
 methodArgumentList: methodExpression (',' methodExpression)*;
 
-methodPropertyAccess: ID ('.' ID)+;
+methodPropertyAccess: IDENTIFIER ('.' IDENTIFIER)+;
 
 methodConditional: methodIfBlock (methodElseIfBlock)* (methodElseBlock)?;
 
@@ -70,13 +70,11 @@ methodElseIfBlock: 'else' 'if' '(' methodExpression ')' '{' methodStatement+ '}'
 
 methodElseBlock: 'else' '{' methodStatement+ '}';
 
-methodForEachLoop: 'foreach' '(' ID ':' methodRange ')' '{' methodStatement+ '}';
+methodForEachLoop: 'foreach' '(' IDENTIFIER ':' methodRange ')' '{' methodStatement+ '}';
 
 methodRange: INT '..' INT;
 
-methodType: (ID | '<' URI '>') ':' ID;
-
-ID: [a-zA-Z_][a-zA-Z0-9_]*;
+methodType: (IDENTIFIER | '<' URI '>') ':' IDENTIFIER;
 
 URI: ~[<>]+;
 
@@ -142,7 +140,7 @@ methodName: IDENTIFIER;
 
 methodParameters: LBRACK methodParameter (COMMA methodParameter)+ RBRACK;
 methodParameter: methodParameterValue '->' methodParameterType;
-methodParameterType: TEXT;
+methodParameterType: methodType;
 methodParameterValue: TEXT;
 
 // Rules describe a transformation of an element at a particular location.

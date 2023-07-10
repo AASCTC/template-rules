@@ -2197,7 +2197,9 @@ public class TemplateRulesParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class MethodParameterTypeContext extends ParserRuleContext {
-		public TerminalNode TEXT() { return getToken(TemplateRulesParser.TEXT, 0); }
+		public MethodTypeContext methodType() {
+			return getRuleContext(MethodTypeContext.class,0);
+		}
 		public MethodParameterTypeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2216,7 +2218,7 @@ public class TemplateRulesParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(353);
-			match(TEXT);
+			methodType();
 			}
 		}
 		catch (RecognitionException re) {
@@ -2678,13 +2680,13 @@ public class TemplateRulesParser extends Parser {
 		"\u015b\u0001\u0000\u0000\u0000\u015b\u015c\u0005%\u0000\u0000\u015cE\u0001"+
 		"\u0000\u0000\u0000\u015d\u015e\u0003J%\u0000\u015e\u015f\u0005\u0002\u0000"+
 		"\u0000\u015f\u0160\u0003H$\u0000\u0160G\u0001\u0000\u0000\u0000\u0161"+
-		"\u0162\u00050\u0000\u0000\u0162I\u0001\u0000\u0000\u0000\u0163\u0164\u0005"+
-		"0\u0000\u0000\u0164K\u0001\u0000\u0000\u0000\u0165\u0166\u0005\u001b\u0000"+
-		"\u0000\u0166\u0168\u0005&\u0000\u0000\u0167\u0169\u0003N\'\u0000\u0168"+
-		"\u0167\u0001\u0000\u0000\u0000\u0169\u016a\u0001\u0000\u0000\u0000\u016a"+
-		"\u0168\u0001\u0000\u0000\u0000\u016a\u016b\u0001\u0000\u0000\u0000\u016b"+
-		"\u016c\u0001\u0000\u0000\u0000\u016c\u016d\u0005\'\u0000\u0000\u016dM"+
-		"\u0001\u0000\u0000\u0000\u016e\u016f\u0005\u001c\u0000\u0000\u016f\u0170"+
+		"\u0162\u0003\u001e\u000f\u0000\u0162I\u0001\u0000\u0000\u0000\u0163\u0164"+
+		"\u00050\u0000\u0000\u0164K\u0001\u0000\u0000\u0000\u0165\u0166\u0005\u001b"+
+		"\u0000\u0000\u0166\u0168\u0005&\u0000\u0000\u0167\u0169\u0003N\'\u0000"+
+		"\u0168\u0167\u0001\u0000\u0000\u0000\u0169\u016a\u0001\u0000\u0000\u0000"+
+		"\u016a\u0168\u0001\u0000\u0000\u0000\u016a\u016b\u0001\u0000\u0000\u0000"+
+		"\u016b\u016c\u0001\u0000\u0000\u0000\u016c\u016d\u0005\'\u0000\u0000\u016d"+
+		"M\u0001\u0000\u0000\u0000\u016e\u016f\u0005\u001c\u0000\u0000\u016f\u0170"+
 		"\u0005&\u0000\u0000\u0170\u0171\u0005\u001d\u0000\u0000\u0171\u0172\u0005"+
 		"\"\u0000\u0000\u0172\u0173\u0003P(\u0000\u0173\u0174\u0005\u001e\u0000"+
 		"\u0000\u0174\u0175\u0005\"\u0000\u0000\u0175\u0176\u0003R)\u0000\u0176"+

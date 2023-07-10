@@ -5,8 +5,7 @@ import java.util.List;
 
 import org.javatuples.Pair;
 
-import com.aasctc.template_rules.antlr.TemplateRulesParser.MethodProgramContext;
-import com.aasctc.template_rules.antlr.TemplateRulesParser.MethodStatementContext;
+import com.aasctc.template_rules.antlr.TemplateRulesParser.*;
 
 import com.aasctc.template_rules.Namespace;
 import com.aasctc.template_rules.Type;
@@ -41,6 +40,9 @@ public class MethodProgram {
 			"delete",
 			"deleteAll"
 	};
+	
+	MethodProgramContext context;
+	List<Namespace> namespaces;
 	
 	/**
 	 * This method has no effect for non-numerical types.
@@ -759,11 +761,37 @@ public class MethodProgram {
 		}
 	}
 	
+	private Type GetType(MethodTypeContext methodType) {
+		return new Type(); //FIXME
+	}
+	
+	private void ProcessAssignment(MethodAssignmentContext assignment) {
+		String variableName = assignment.IDENTIFIER().toString();
+		
+	}
+
+
+	private void ProcessConditional(MethodConditionalContext assignment) {
+		
+	}
+
+	private void ProcessExpression(MethodExpressionContext expression) {
+		
+	}
+
+	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) {
+		
+	}
+	
+	private void ProcessReturn(MethodReturnContext returnStatement) {
+		
+	}
+	
 	// This is a good foundation.
 	private void ProcessStatement(MethodStatementContext statement) {
 		String text = statement.getText();
 		try {
-			statement.methodAssignment();
+			ProcessAssignment(statement.methodAssignment());
 		}
 		catch (Exception e) {
 			;
@@ -798,15 +826,25 @@ public class MethodProgram {
 		
 	}
 	
-	public MethodProgram(MethodProgramContext context) {
-		// This is where the method is compiled into an interpretable form.
-		List<MethodStatementContext> statements = context.methodStatement();
-		for (MethodStatementContext statement: statements) {
-			ProcessStatement(statement);
-		}
+	public MethodProgram(MethodProgramContext inputContext, List<Namespace> inputNamespaces) {
+		context = inputContext;
+		namespaces = inputNamespaces;
 	}
 
 	public MethodProgram() {
 		// TODO Auto-generated constructor stub
+	}
+	
+	public Pair<Type, String> Interpret(String input) {
+		List<Variable> variables;
+		Pair<Type, String> returnValue = null;
+		List<MethodStatementContext> statements = context.methodStatement();
+		for (MethodStatementContext statement: statements) {
+			ProcessStatement(statement);
+		}
+		
+		//TODO ...fill in the rest of this method
+		
+		return returnValue;
 	}
 }
