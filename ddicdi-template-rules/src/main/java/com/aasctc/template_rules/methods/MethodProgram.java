@@ -759,11 +759,50 @@ public class MethodProgram {
 		}
 	}
 	
+	// This is a good foundation.
+	private void ProcessStatement(MethodStatementContext statement) {
+		String text = statement.getText();
+		try {
+			statement.methodAssignment();
+		}
+		catch (Exception e) {
+			;
+		}
+
+		try {
+			statement.methodConditional();
+		}
+		catch (Exception e) {
+			;
+		}
+		
+		try {
+			statement.methodExpression();
+		}
+		catch (Exception e) {
+			;
+		}
+		
+		try {
+			statement.methodForEachLoop();
+		}
+		catch (Exception e) {
+			;
+		}
+		try {
+			statement.methodReturn();
+		}
+		catch (Exception e) {
+			;
+		}
+		
+	}
+	
 	public MethodProgram(MethodProgramContext context) {
 		// This is where the method is compiled into an interpretable form.
 		List<MethodStatementContext> statements = context.methodStatement();
 		for (MethodStatementContext statement: statements) {
-			String text = statement.getText();
+			ProcessStatement(statement);
 		}
 	}
 

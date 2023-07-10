@@ -12,20 +12,6 @@ public class Method {
 	List<String> parameters;
 	MethodProgram program;
 	
-	public class Variable {
-		String name;
-		Type type;
-		String value;
-		
-		public Variable() {}
-		
-		public Variable(String inputName, Type inputType, String inputValue) {
-			name = inputName;
-			type = inputType;
-			value = inputValue;
-		}
-	}
-	
 	public Method() {
 		name = "";
 		parameters = new ArrayList<String>();
