@@ -2,6 +2,7 @@ package com.aasctc.template_rules.methods;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.javatuples.Pair;
 
@@ -9,6 +10,7 @@ import com.aasctc.template_rules.antlr.TemplateRulesParser.*;
 
 import com.aasctc.template_rules.Namespace;
 import com.aasctc.template_rules.Type;
+import com.aasctc.template_rules.UnknownNamespaceException;
 
 /**
  * 
@@ -43,6 +45,7 @@ public class MethodProgram {
 	
 	MethodProgramContext context;
 	List<Namespace> namespaces;
+	MethodProgramState state;
 	
 	/**
 	 * This method has no effect for non-numerical types.
@@ -761,12 +764,38 @@ public class MethodProgram {
 		}
 	}
 	
-	private Type GetType(MethodTypeContext methodType) {
-		return new Type(); //FIXME
-	}
-	
-	private void ProcessAssignment(MethodAssignmentContext assignment) {
+	private void ProcessAssignment(MethodAssignmentContext assignment) throws IllegalAssignmentException {
 		String variableName = assignment.IDENTIFIER().toString();
+		Type type;
+		Optional<Variable> oldVariable = Optional.empty();
+		Variable newVariable;
+				
+		try {
+			type = new Type(assignment.methodType().toString(), namespaces);
+		} catch (UnknownNamespaceException e) {
+			throw new IllegalAssignmentException("Unknown type of variable");
+		}
+		
+		Pair<Type, String> value = ProcessExpression(assignment.methodExpression());
+		newVariable = new Variable(variableName, type, value.getValue1());
+		
+		for (Variable variable: state.variables) {
+			if (variable.name == variableName && variable.type != type) {
+				throw new IllegalAssignmentException(String.format("Type mismatch during assignment of variable \"%s\": Expected %s, got %s",
+						variableName, variable.type.toString(false), variable.type.toString(false)));
+			}
+			else {
+				oldVariable = Optional.of(variable);
+				break;
+			}
+		}
+		
+		if (oldVariable.isEmpty()) {
+			state.variables.add(newVariable);
+		}
+		else {
+			state.variables.set(state.variables.indexOf(oldVariable.get()), newVariable);
+		}
 		
 	}
 
@@ -775,7 +804,7 @@ public class MethodProgram {
 		
 	}
 
-	private void ProcessExpression(MethodExpressionContext expression) {
+	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) {
 		
 	}
 
@@ -826,7 +855,8 @@ public class MethodProgram {
 		
 	}
 	
-	public MethodProgram(MethodProgramContext inputContext, List<Namespace> inputNamespaces) {
+	public MethodProgram(MethodProgramContext inputContext, List<Namespace> inputNamespaces,
+			List<Pair<Type, String>> parameters, Pair<Type, String> input) {
 		context = inputContext;
 		namespaces = inputNamespaces;
 	}
@@ -835,8 +865,9 @@ public class MethodProgram {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Pair<Type, String> Interpret(String input) {
-		List<Variable> variables;
+	public Pair<Type, String> Interpret(Pair<Type, String> input) {
+		state.variables.add(new Variable("input", input.getValue0(), input.getValue1()));
+		
 		Pair<Type, String> returnValue = null;
 		List<MethodStatementContext> statements = context.methodStatement();
 		for (MethodStatementContext statement: statements) {

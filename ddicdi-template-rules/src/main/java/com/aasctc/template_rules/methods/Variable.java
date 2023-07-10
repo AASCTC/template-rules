@@ -3,9 +3,9 @@ package com.aasctc.template_rules.methods;
 import com.aasctc.template_rules.Type;
 
 class Variable {
-	String name;
-	Type type;
-	String value;
+	public String name;
+	public Type type;
+	public String value;
 	
 	public Variable() {}
 	

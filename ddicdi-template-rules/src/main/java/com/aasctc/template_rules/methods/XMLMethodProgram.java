@@ -3,6 +3,7 @@ package com.aasctc.template_rules.methods;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -20,12 +21,13 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.aasctc.template_rules.antlr.TemplateRulesParser.MethodProgramContext;
+import com.aasctc.template_rules.Namespace;
 import com.aasctc.template_rules.Type;
 
 public class XMLMethodProgram extends MethodProgram {
-    public XMLMethodProgram(MethodProgramContext context) {
-		super(context);
-		// TODO Auto-generated constructor stub
+    public XMLMethodProgram(MethodProgramContext context, List<Namespace> namespaces,
+			List<Pair<Type, String>> parameters, Pair<Type, String> input) {
+		super(context, namespaces, parameters, input);
 	}
 
 	private static String convertXmlToString(Document doc) {
