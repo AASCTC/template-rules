@@ -5,8 +5,8 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 public class Type {
-	Namespace namespace;
-	String label;
+	public Namespace namespace;
+	public String label;
 	public Type() {
 		namespace = new Namespace();
 		label = "";
