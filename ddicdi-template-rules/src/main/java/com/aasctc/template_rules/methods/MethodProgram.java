@@ -800,23 +800,44 @@ public class MethodProgram {
 	}
 
 
+	//TODO
 	private void ProcessConditional(MethodConditionalContext assignment) {
 		
 	}
 
+	//TODO
 	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) {
 		
 	}
 
 	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) {
+		MethodRangeContext context = forEachLoop.methodRange();
+		Integer start = Integer.parseInt(context.INT(0).getText());
+		Integer end = Integer.parseInt(context.INT(1).getText());
+		Namespace intNamespace = new Namespace("<https://www.w3.org/2001/XMLSchema#>", "xsd");
+		Type intType = new Type(intNamespace, "int");
 		
+		Variable identifier = new Variable(forEachLoop.IDENTIFIER().getText(),
+				intType, start.toString());
+		state.variables.add(identifier);
+		for (Integer i = start; i < end; i++) {
+			for (MethodStatementContext statement: forEachLoop.methodStatement()) {
+				ProcessStatement(statement);
+				if (state.returning) {
+					return;
+				}
+			}
+		}
+		state.variables.remove(identifier);
 	}
 	
 	private void ProcessReturn(MethodReturnContext returnStatement) {
+		Pair<Type, String> expression = ProcessExpression(returnStatement.methodExpression());
+		state.returning = true;
+		state.returnValue = expression;
 		
 	}
 	
-	// This is a good foundation.
 	private void ProcessStatement(MethodStatementContext statement) {
 		String text = statement.getText();
 		try {
@@ -827,27 +848,34 @@ public class MethodProgram {
 		}
 
 		try {
-			statement.methodConditional();
+			ProcessConditional(statement.methodConditional());
+			if (state.returning) {
+				return;
+			}
 		}
 		catch (Exception e) {
 			;
 		}
 		
 		try {
-			statement.methodExpression();
+			ProcessExpression(statement.methodExpression());
 		}
 		catch (Exception e) {
 			;
 		}
 		
 		try {
-			statement.methodForEachLoop();
+			ProcessForEachLoop(statement.methodForEachLoop());
+			if (state.returning) {
+				return;
+			}
 		}
 		catch (Exception e) {
 			;
 		}
 		try {
-			statement.methodReturn();
+			ProcessReturn(statement.methodReturn());
+			return;
 		}
 		catch (Exception e) {
 			;
@@ -868,14 +896,12 @@ public class MethodProgram {
 	public Pair<Type, String> Interpret(Pair<Type, String> input) {
 		state.variables.add(new Variable("input", input.getValue0(), input.getValue1()));
 		
-		Pair<Type, String> returnValue = null;
 		List<MethodStatementContext> statements = context.methodStatement();
 		for (MethodStatementContext statement: statements) {
 			ProcessStatement(statement);
 		}
-		
-		//TODO ...fill in the rest of this method
-		
+	
+		Pair<Type, String> returnValue = state.returnValue;
 		return returnValue;
 	}
 }
