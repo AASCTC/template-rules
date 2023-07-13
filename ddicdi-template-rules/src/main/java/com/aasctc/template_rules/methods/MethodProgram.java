@@ -1,3 +1,4 @@
+
 package com.aasctc.template_rules.methods;
 
 import java.math.BigDecimal;
@@ -46,7 +47,18 @@ public class MethodProgram {
 	MethodProgramContext context;
 	List<Namespace> namespaces;
 	MethodProgramState state;
-	
+
+	public static Boolean isTrue(Pair<Type, String> variable) {
+		BigDecimal d = new BigDecimal(variable.getValue1());
+		if (MethodProgram.isRealNumber(null) && d.compareTo(BigDecimal.ZERO) == 0) {
+			return false;
+		}
+		else if (variable.getValue0().toString(false) == "xsd:string"
+				&& variable.getValue1() == "") {
+			return false;
+		}
+		else return true;
+	}
 	/**
 	 * This method has no effect for non-numerical types.
 	 * 
@@ -801,13 +813,44 @@ public class MethodProgram {
 
 
 	//TODO
-	private void ProcessConditional(MethodConditionalContext assignment) {
-		
+	private void ProcessConditional(MethodConditionalContext conditional) {
+		MethodIfBlockContext ifContext = conditional.methodIfBlock();
+		Pair<Type, String> ifExpression = ProcessExpression(ifContext.methodExpression());
+		if (isTrue(ifExpression)) {
+			for (MethodStatementContext statement: ifContext.methodStatement()) {
+				ProcessStatement(statement);
+				if (state.returning) {
+					return;
+				}
+			}
+			return;
+		}
+		for (MethodElseIfBlockContext elseifContext: conditional.methodElseIfBlock()) {
+			Pair<Type, String> elseifExpression = ProcessExpression(elseifContext.methodExpression());
+			if (isTrue(elseifExpression)) {
+				for (MethodStatementContext statement: elseifContext.methodStatement()) {
+					ProcessStatement(statement);
+					if (state.returning) {
+						return;
+					}
+				}
+			}
+			return;
+		}
+		if (!conditional.methodElseBlock().isEmpty()) {
+			MethodElseBlockContext elseContext = conditional.methodElseBlock();
+			for (MethodStatementContext statement: elseContext.methodStatement()) {
+				ProcessStatement(statement);
+				if (state.returning) {
+					return;
+				}
+			}
+		}
 	}
 
 	//TODO
 	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) {
-		
+
 	}
 
 	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) {
@@ -839,7 +882,6 @@ public class MethodProgram {
 	}
 	
 	private void ProcessStatement(MethodStatementContext statement) {
-		String text = statement.getText();
 		try {
 			ProcessAssignment(statement.methodAssignment());
 		}
