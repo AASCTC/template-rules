@@ -811,9 +811,7 @@ public class MethodProgram {
 		
 	}
 
-
-	//TODO
-	private void ProcessConditional(MethodConditionalContext conditional) {
+	private void ProcessConditional(MethodConditionalContext conditional) throws IllegalAssignmentException {
 		MethodIfBlockContext ifContext = conditional.methodIfBlock();
 		Pair<Type, String> ifExpression = ProcessExpression(ifContext.methodExpression());
 		if (isTrue(ifExpression)) {
@@ -853,7 +851,7 @@ public class MethodProgram {
 
 	}
 
-	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) {
+	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) throws IllegalAssignmentException {
 		MethodRangeContext context = forEachLoop.methodRange();
 		Integer start = Integer.parseInt(context.INT(0).getText());
 		Integer end = Integer.parseInt(context.INT(1).getText());
@@ -881,48 +879,22 @@ public class MethodProgram {
 		
 	}
 	
-	private void ProcessStatement(MethodStatementContext statement) {
-		try {
+	private void ProcessStatement(MethodStatementContext statement) throws IllegalAssignmentException {
+		if (!statement.methodAssignment().isEmpty()) {
 			ProcessAssignment(statement.methodAssignment());
 		}
-		catch (Exception e) {
-			;
-		}
-
-		try {
+		else if (!statement.methodConditional().isEmpty()) {
 			ProcessConditional(statement.methodConditional());
-			if (state.returning) {
-				return;
-			}
 		}
-		catch (Exception e) {
-			;
-		}
-		
-		try {
+		else if (!statement.methodExpression().isEmpty()) {
 			ProcessExpression(statement.methodExpression());
 		}
-		catch (Exception e) {
-			;
-		}
-		
-		try {
+		else if (!statement.methodForEachLoop().isEmpty()) {
 			ProcessForEachLoop(statement.methodForEachLoop());
-			if (state.returning) {
-				return;
-			}
 		}
-		catch (Exception e) {
-			;
-		}
-		try {
+		else if (!statement.methodReturn().isEmpty()) {
 			ProcessReturn(statement.methodReturn());
-			return;
 		}
-		catch (Exception e) {
-			;
-		}
-		
 	}
 	
 	public MethodProgram(MethodProgramContext inputContext, List<Namespace> inputNamespaces,
@@ -935,7 +907,7 @@ public class MethodProgram {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Pair<Type, String> Interpret(Pair<Type, String> input) {
+	public Pair<Type, String> Interpret(Pair<Type, String> input) throws IllegalAssignmentException {
 		state.variables.add(new Variable("input", input.getValue0(), input.getValue1()));
 		
 		List<MethodStatementContext> statements = context.methodStatement();
