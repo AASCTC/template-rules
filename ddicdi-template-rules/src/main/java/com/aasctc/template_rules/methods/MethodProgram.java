@@ -776,7 +776,7 @@ public class MethodProgram {
 		}
 	}
 	
-	private void ProcessAssignment(MethodAssignmentContext assignment) throws IllegalAssignmentException {
+	private void ProcessAssignment(MethodAssignmentContext assignment) throws IllegalAssignmentException, UnsupportedOperationException {
 		String variableName = assignment.IDENTIFIER().toString();
 		Type type;
 		Optional<Variable> oldVariable = Optional.empty();
@@ -811,7 +811,7 @@ public class MethodProgram {
 		
 	}
 
-	private void ProcessConditional(MethodConditionalContext conditional) throws IllegalAssignmentException {
+	private void ProcessConditional(MethodConditionalContext conditional) throws IllegalAssignmentException, UnsupportedOperationException {
 		MethodIfBlockContext ifContext = conditional.methodIfBlock();
 		Pair<Type, String> ifExpression = ProcessExpression(ifContext.methodExpression());
 		if (isTrue(ifExpression)) {
@@ -846,12 +846,29 @@ public class MethodProgram {
 		}
 	}
 
-	//TODO
-	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) {
-
+	private Pair<Type, String> ProcessFunctionCall(MethodFunctionCallContext functionCall) {
+		
 	}
 
-	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) throws IllegalAssignmentException {
+	private Pair<Type, String> ProcessPrimaryExpression(MethodPrimaryExpressionContext primaryExpression){
+		
+	}	
+	
+	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) throws UnsupportedOperationException {
+		if (!expression.methodFunctionCall().isEmpty()) {
+			return ProcessFunctionCall(expression.methodFunctionCall());
+		}
+		else if (!expression.methodPrimaryExpression().isEmpty()) {
+			return ProcessPrimaryExpression(expression.methodPrimaryExpression());
+		}
+		else if (!expression.methodPropertyAccess().isEmpty()) {
+			throw new UnsupportedOperationException(
+					"The base string-oriented MethodProgram does not support property"
+					+ " access. Use XMLMethodProgram instead.");
+		}
+	}
+
+	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) throws IllegalAssignmentException, UnsupportedOperationException {
 		MethodRangeContext context = forEachLoop.methodRange();
 		Integer start = Integer.parseInt(context.INT(0).getText());
 		Integer end = Integer.parseInt(context.INT(1).getText());
@@ -872,14 +889,14 @@ public class MethodProgram {
 		state.variables.remove(identifier);
 	}
 	
-	private void ProcessReturn(MethodReturnContext returnStatement) {
+	private void ProcessReturn(MethodReturnContext returnStatement) throws UnsupportedOperationException {
 		Pair<Type, String> expression = ProcessExpression(returnStatement.methodExpression());
 		state.returning = true;
 		state.returnValue = expression;
 		
 	}
 	
-	private void ProcessStatement(MethodStatementContext statement) throws IllegalAssignmentException {
+	private void ProcessStatement(MethodStatementContext statement) throws IllegalAssignmentException, UnsupportedOperationException {
 		if (!statement.methodAssignment().isEmpty()) {
 			ProcessAssignment(statement.methodAssignment());
 		}
@@ -907,7 +924,7 @@ public class MethodProgram {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Pair<Type, String> Interpret(Pair<Type, String> input) throws IllegalAssignmentException {
+	public Pair<Type, String> Interpret(Pair<Type, String> input) throws IllegalAssignmentException, UnsupportedOperationException {
 		state.variables.add(new Variable("input", input.getValue0(), input.getValue1()));
 		
 		List<MethodStatementContext> statements = context.methodStatement();
