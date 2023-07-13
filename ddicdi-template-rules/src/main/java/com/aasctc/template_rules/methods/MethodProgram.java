@@ -851,7 +851,28 @@ public class MethodProgram {
 	}
 
 	private Pair<Type, String> ProcessPrimaryExpression(MethodPrimaryExpressionContext primaryExpression){
-		
+		if (!primaryExpression.intConstant().isEmpty()) {
+			IntConstantContext intConstant = primaryExpression.intConstant();
+			//TODO perhaps move this type processing part to a new function
+			Type resultType = new Type();
+			if (intConstant.methodType().isEmpty()) {
+				resultType = new Type(new Namespace("<https://www.w3.org/2001/XMLSchema#>", "xsd"),
+						"int");
+			}
+			else {
+				MethodTypeContext methodType = intConstant.methodType();
+				for (Namespace namespace: namespaces) {
+					if (!methodType.longFormMethodType().isEmpty() &&
+							namespace.name == methodType.longFormMethodType().TEXT().getText()) {
+						resultType = new Type(namespace, methodType.longFormMethodType().IDENTIFIER().getText());
+					}
+					else if (!methodType.shortFormMethodType().isEmpty() &&
+							namespace.alias == methodType.shortFormMethodType().IDENTIFIER(0).getText()) {
+						resultType = new Type(namespace, methodType.shortFormMethodType().IDENTIFIER(1).getText());
+					}
+				}
+			}
+		}
 	}	
 	
 	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) throws UnsupportedOperationException {

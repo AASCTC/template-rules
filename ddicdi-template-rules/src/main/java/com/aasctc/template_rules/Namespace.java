@@ -1,8 +1,8 @@
 package com.aasctc.template_rules;
 
 public class Namespace {
-	String name;
-	String alias;
+	public String name;
+	public String alias;
 	public Namespace() {
 		name = "";
 		alias = "";

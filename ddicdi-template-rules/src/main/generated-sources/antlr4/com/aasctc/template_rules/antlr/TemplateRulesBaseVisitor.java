@@ -151,6 +151,20 @@ public class TemplateRulesBaseVisitor<T> extends AbstractParseTreeVisitor<T> imp
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitShortFormMethodType(TemplateRulesParser.ShortFormMethodTypeContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitLongFormMethodType(TemplateRulesParser.LongFormMethodTypeContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitTemplateRulesDocument(TemplateRulesParser.TemplateRulesDocumentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

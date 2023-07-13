@@ -125,6 +125,18 @@ public interface TemplateRulesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMethodType(TemplateRulesParser.MethodTypeContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TemplateRulesParser#shortFormMethodType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitShortFormMethodType(TemplateRulesParser.ShortFormMethodTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TemplateRulesParser#longFormMethodType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLongFormMethodType(TemplateRulesParser.LongFormMethodTypeContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TemplateRulesParser#templateRulesDocument}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

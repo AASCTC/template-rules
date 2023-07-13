@@ -78,7 +78,10 @@ methodForEachLoop: 'foreach' '(' IDENTIFIER ':' methodRange ')' '{' methodStatem
 
 methodRange: INT '..' INT;
 
-methodType: (IDENTIFIER | '<' URI '>') ':' IDENTIFIER;
+methodType: shortFormMethodType | longFormMethodType ;
+
+shortFormMethodType: IDENTIFIER ':' IDENTIFIER;
+longFormMethodType: TEXT ':' IDENTIFIER;
 
 URI: ~[<>]+;
 
