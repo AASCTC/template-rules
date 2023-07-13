@@ -47,6 +47,24 @@ public interface TemplateRulesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMethodPrimaryExpression(TemplateRulesParser.MethodPrimaryExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TemplateRulesParser#intConstant}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIntConstant(TemplateRulesParser.IntConstantContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TemplateRulesParser#floatConstant}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFloatConstant(TemplateRulesParser.FloatConstantContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TemplateRulesParser#stringConstant}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStringConstant(TemplateRulesParser.StringConstantContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TemplateRulesParser#methodFunctionCall}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

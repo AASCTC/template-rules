@@ -49,12 +49,16 @@ methodExpression: methodPrimaryExpression
                 | methodPropertyAccess
                 ;
 
-methodPrimaryExpression: INT
-                       | FLOAT
-                       | STRING
+methodPrimaryExpression: intConstant
+                       | floatConstant
+                       | stringConstant
                        | IDENTIFIER
                        | '(' methodExpression ')'
                        ;
+
+intConstant: INT ('->' methodType)? ;
+floatConstant: FLOAT ('->' methodType)? ;
+stringConstant: STRING ('->' methodType)? ;
 
 methodFunctionCall: IDENTIFIER '(' methodArgumentList? ')';
 
