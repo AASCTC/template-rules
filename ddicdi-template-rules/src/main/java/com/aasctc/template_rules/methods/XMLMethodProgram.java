@@ -15,15 +15,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.javatuples.Pair;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.aasctc.template_rules.antlr.TemplateRulesParser.MethodProgramContext;
 import com.aasctc.template_rules.Namespace;
-import com.aasctc.template_rules.Type;
 
 public class XMLMethodProgram extends MethodProgram {
     public XMLMethodProgram(MethodProgramContext context, List<Namespace> namespaces,
