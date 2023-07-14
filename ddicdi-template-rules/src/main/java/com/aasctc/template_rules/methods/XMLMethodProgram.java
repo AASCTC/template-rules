@@ -17,6 +17,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.javatuples.Pair;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -65,6 +66,23 @@ public class XMLMethodProgram extends MethodProgram {
             throw new RuntimeException(e);
         }
     }
+    
+	public static VolatileVariable function_append(
+			VolatileVariable op,
+			VolatileVariable op2) throws IllegalArgumentException {
+
+		try {
+			Document doc1 = XMLMethodProgram.convertStringToXml(op.getValue1());
+			Document doc2 = XMLMethodProgram.convertStringToXml(op2.getValue1());
+
+			doc1.appendChild(doc2.cloneNode(true));
+			String result = XMLMethodProgram.convertXmlToString(doc1);
+			return new VolatileVariable(op.getValue0(), result);
+		}
+		catch(RuntimeException e) {
+			throw new IllegalArgumentException("Failed to parse XML");
+		}
+	}
 
 	public static VolatileVariable function_index(
 			VolatileVariable op,
@@ -97,10 +115,25 @@ public class XMLMethodProgram extends MethodProgram {
 		try {
 			Document doc1 = XMLMethodProgram.convertStringToXml(op.getValue1());
 			int index = Integer.parseInt(op2.getValue1());
-			// We should not be doing this. We have to consider this as XML and
-			// extract the first node.
 			doc1.removeChild(doc1.getChildNodes().item(index));
 			String result = XMLMethodProgram.convertXmlToString(doc1);
+			return new VolatileVariable(op.getValue0(), result);
+		}
+		catch(RuntimeException e) {
+			throw new IllegalArgumentException("Failed to parse XML");
+		}
+	}
+
+
+	public static VolatileVariable function_clear(
+			VolatileVariable op) throws IllegalArgumentException {
+		try {
+			Document doc1 = XMLMethodProgram.convertStringToXml(op.getValue1());
+			Document doc2 = doc1;
+			for (int i = 0; i < doc1.getChildNodes().getLength(); i++) {
+				doc2.removeChild(doc1.getChildNodes().item(i));
+			}
+			String result = XMLMethodProgram.convertXmlToString(doc2);
 			return new VolatileVariable(op.getValue0(), result);
 		}
 		catch(RuntimeException e) {
