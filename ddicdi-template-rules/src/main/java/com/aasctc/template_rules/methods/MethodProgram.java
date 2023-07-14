@@ -2,6 +2,7 @@
 package com.aasctc.template_rules.methods;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
@@ -776,7 +777,7 @@ public class MethodProgram {
 		}
 	}
 	
-	private void ProcessAssignment(MethodAssignmentContext assignment) throws IllegalAssignmentException, UnsupportedOperationException {
+	private void ProcessAssignment(MethodAssignmentContext assignment) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException {
 		String variableName = assignment.IDENTIFIER().toString();
 		Type type;
 		Optional<Variable> oldVariable = Optional.empty();
@@ -811,7 +812,7 @@ public class MethodProgram {
 		
 	}
 
-	private void ProcessConditional(MethodConditionalContext conditional) throws IllegalAssignmentException, UnsupportedOperationException {
+	private void ProcessConditional(MethodConditionalContext conditional) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException {
 		MethodIfBlockContext ifContext = conditional.methodIfBlock();
 		Pair<Type, String> ifExpression = ProcessExpression(ifContext.methodExpression());
 		if (isTrue(ifExpression)) {
@@ -845,37 +846,93 @@ public class MethodProgram {
 			}
 		}
 	}
+	
+	private Type ProcessMethodType(MethodTypeContext methodType) throws UnknownTypeException {
+		for (Namespace namespace: namespaces) {
+			if (!methodType.longFormMethodType().isEmpty() &&
+					namespace.name == methodType.longFormMethodType().TEXT().getText()) {
+				return new Type(namespace, methodType.longFormMethodType().IDENTIFIER().getText());
+			}
+			else if (!methodType.shortFormMethodType().isEmpty() &&
+					namespace.alias == methodType.shortFormMethodType().IDENTIFIER(0).getText()) {
+				return new Type(namespace, methodType.shortFormMethodType().IDENTIFIER(1).getText());
+			}
+		}
+		throw new UnknownTypeException("Unknown namespace for type");
+	}
 
 	private Pair<Type, String> ProcessFunctionCall(MethodFunctionCallContext functionCall) {
 		
 	}
 
-	private Pair<Type, String> ProcessPrimaryExpression(MethodPrimaryExpressionContext primaryExpression){
+	private Pair<Type, String> ProcessPrimaryExpression(MethodPrimaryExpressionContext primaryExpression) throws UnknownTypeException, UnsupportedOperationException {
 		if (!primaryExpression.intConstant().isEmpty()) {
 			IntConstantContext intConstant = primaryExpression.intConstant();
-			//TODO perhaps move this type processing part to a new function
 			Type resultType = new Type();
 			if (intConstant.methodType().isEmpty()) {
-				resultType = new Type(new Namespace("<https://www.w3.org/2001/XMLSchema#>", "xsd"),
-						"int");
+				resultType = new Type(new Namespace("<https://www.w3.org/2001/XMLSchema#>", "xsd"), "int");
 			}
 			else {
-				MethodTypeContext methodType = intConstant.methodType();
-				for (Namespace namespace: namespaces) {
-					if (!methodType.longFormMethodType().isEmpty() &&
-							namespace.name == methodType.longFormMethodType().TEXT().getText()) {
-						resultType = new Type(namespace, methodType.longFormMethodType().IDENTIFIER().getText());
-					}
-					else if (!methodType.shortFormMethodType().isEmpty() &&
-							namespace.alias == methodType.shortFormMethodType().IDENTIFIER(0).getText()) {
-						resultType = new Type(namespace, methodType.shortFormMethodType().IDENTIFIER(1).getText());
-					}
+				resultType = ProcessMethodType(intConstant.methodType());
+				
+			}
+			try {
+				new BigInteger(intConstant.INT().getText());
+			}
+			catch (NumberFormatException e) {
+				throw new UnknownTypeException("Int constant is not an integer");
+			}
+			return new Pair<Type, String>(resultType, intConstant.INT().getText());
+		}
+		else if (!primaryExpression.floatConstant().isEmpty()) {
+			FloatConstantContext floatConstant = primaryExpression.floatConstant();
+			Type resultType = new Type();
+			if (floatConstant.methodType().isEmpty()) {
+				resultType = new Type(new Namespace("<https://www.w3.org/2001/XMLSchema#>", "xsd"),
+						"decimal");
+			}
+			else {
+				resultType = ProcessMethodType(floatConstant.methodType());
+				
+			}
+			try {
+				new BigDecimal(floatConstant.FLOAT().getText());
+			}
+			catch (NumberFormatException e) {
+				throw new UnknownTypeException("Float constant is not an floating-point number");
+			}
+			return new Pair<Type, String>(resultType, floatConstant.FLOAT().getText());
+		}
+		else if (!primaryExpression.stringConstant().isEmpty()) {
+			StringConstantContext stringConstant = primaryExpression.stringConstant();
+			Type resultType = new Type();
+			if (stringConstant.methodType().isEmpty()) {
+				resultType = new Type(new Namespace("<https://www.w3.org/2001/XMLSchema#>", "xsd"),
+						"string");
+			}
+			else {
+				resultType = ProcessMethodType(stringConstant.methodType());
+				
+			}
+			return new Pair<Type, String>(resultType, stringConstant.STRING().getText());
+		}
+		else if (primaryExpression.IDENTIFIER().getText() != "") {
+			String name = primaryExpression.IDENTIFIER().getText();			
+			for (Variable variable: state.variables) {
+				if (variable.name == name) {
+					return new Pair<Type, String>(variable.type, variable.value);
 				}
 			}
+			throw new UnknownTypeException(String.format("Unknown variable \"%s\"", name));
 		}
+		else if (!primaryExpression.methodExpression().isEmpty()) {
+			return ProcessExpression(primaryExpression.methodExpression());
+		}
+		
+		throw new RuntimeException("Unreachable code (???)");
 	}	
 	
-	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) throws UnsupportedOperationException {
+	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) throws UnsupportedOperationException, UnknownTypeException {
 		if (!expression.methodFunctionCall().isEmpty()) {
 			return ProcessFunctionCall(expression.methodFunctionCall());
 		}
@@ -887,9 +944,10 @@ public class MethodProgram {
 					"The base string-oriented MethodProgram does not support property"
 					+ " access. Use XMLMethodProgram instead.");
 		}
+		throw new RuntimeException("Unreachable code (???)");
 	}
 
-	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) throws IllegalAssignmentException, UnsupportedOperationException {
+	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException {
 		MethodRangeContext context = forEachLoop.methodRange();
 		Integer start = Integer.parseInt(context.INT(0).getText());
 		Integer end = Integer.parseInt(context.INT(1).getText());
@@ -910,14 +968,14 @@ public class MethodProgram {
 		state.variables.remove(identifier);
 	}
 	
-	private void ProcessReturn(MethodReturnContext returnStatement) throws UnsupportedOperationException {
+	private void ProcessReturn(MethodReturnContext returnStatement) throws UnsupportedOperationException, UnknownTypeException {
 		Pair<Type, String> expression = ProcessExpression(returnStatement.methodExpression());
 		state.returning = true;
 		state.returnValue = expression;
 		
 	}
 	
-	private void ProcessStatement(MethodStatementContext statement) throws IllegalAssignmentException, UnsupportedOperationException {
+	private void ProcessStatement(MethodStatementContext statement) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException {
 		if (!statement.methodAssignment().isEmpty()) {
 			ProcessAssignment(statement.methodAssignment());
 		}
@@ -945,7 +1003,7 @@ public class MethodProgram {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Pair<Type, String> Interpret(Pair<Type, String> input) throws IllegalAssignmentException, UnsupportedOperationException {
+	public Pair<Type, String> Interpret(Pair<Type, String> input) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException {
 		state.variables.add(new Variable("input", input.getValue0(), input.getValue1()));
 		
 		List<MethodStatementContext> statements = context.methodStatement();
