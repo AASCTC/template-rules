@@ -1,9 +1,12 @@
 
 package com.aasctc.template_rules.methods;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.javatuples.Pair;
@@ -13,6 +16,9 @@ import com.aasctc.template_rules.antlr.TemplateRulesParser.*;
 import com.aasctc.template_rules.Namespace;
 import com.aasctc.template_rules.Type;
 import com.aasctc.template_rules.UnknownNamespaceException;
+
+//TODO probably Pair<> is not the best type to be using for passing values
+//because of reflection, better to make this a class instead.
 
 /**
  * 
@@ -33,17 +39,7 @@ public class MethodProgram {
 	};
 	
 	// Edit this to add more functions as appropriate.
-	String[] functions = {
-			"add",
-			"sub",
-			"mul",
-			"div",
-			"mod",
-			"append",
-			"index",
-			"delete",
-			"deleteAll"
-	};
+	List<Pair<String, Integer>> functions = new ArrayList<Pair<String, Integer>>();
 	
 	MethodProgramContext context;
 	List<Namespace> namespaces;
@@ -758,18 +754,10 @@ public class MethodProgram {
 		}
 	}
 
-	public static Pair<Type, String> function_delete(
-			Pair<Type, String> op,
-			Pair<Type, String> op2) throws IllegalArgumentException {
-
-		if (!MethodProgram.isIntegerNumber(op2.getValue0())) {
-			throw new IllegalArgumentException("Second argument must be an integer");
-		}
+	public static Pair<Type, String> function_clear(
+			Pair<Type, String> op) throws IllegalArgumentException {
 		try {
-			int index = Integer.parseInt(op2.getValue1());
-
-			StringBuilder sb = new StringBuilder(op.getValue1());
-			String result = sb.deleteCharAt(index).toString();
+			String result = "";
 			return new Pair<Type, String>(op.getValue0(), result);
 		}
 		catch(StringIndexOutOfBoundsException e) {
@@ -777,7 +765,7 @@ public class MethodProgram {
 		}
 	}
 	
-	private void ProcessAssignment(MethodAssignmentContext assignment) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException {
+	private void ProcessAssignment(MethodAssignmentContext assignment) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		String variableName = assignment.IDENTIFIER().toString();
 		Type type;
 		Optional<Variable> oldVariable = Optional.empty();
@@ -812,7 +800,7 @@ public class MethodProgram {
 		
 	}
 
-	private void ProcessConditional(MethodConditionalContext conditional) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException {
+	private void ProcessConditional(MethodConditionalContext conditional) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		MethodIfBlockContext ifContext = conditional.methodIfBlock();
 		Pair<Type, String> ifExpression = ProcessExpression(ifContext.methodExpression());
 		if (isTrue(ifExpression)) {
@@ -861,11 +849,42 @@ public class MethodProgram {
 		throw new UnknownTypeException("Unknown namespace for type");
 	}
 
-	private Pair<Type, String> ProcessFunctionCall(MethodFunctionCallContext functionCall) {
+	private Pair<Type, String> ProcessFunctionCall(MethodFunctionCallContext functionCall) throws InvocationTargetException, UnsupportedOperationException, UnknownTypeException, NoSuchMethodException, SecurityException {
+		List<Pair<Type, String>> arguments = new ArrayList<Pair<Type, String>>();
+		for (MethodExpressionContext expression: functionCall.methodArgumentList().methodExpression()) {
+			arguments.add(ProcessExpression(expression));
+		}
 		
+		String functionName = functionCall.IDENTIFIER().toString();
+		for (Pair<String, Integer> function: functions) {
+			String name = function.getValue0();
+			Integer numberOfParameters = function.getValue1();
+			if (name == functionName) {
+				if (arguments.size() != numberOfParameters) {
+					throw new java.lang.IllegalArgumentException(String.format(
+							"Wrong number of parameters to function %s, expected %d parameters,"
+							+ "got %d instead", functionName, numberOfParameters, arguments.size()));
+				}
+				Class<? extends MethodProgram> reflectionClass = this.getClass();
+				Method reflectionMethod = reflectionClass.getMethod("function_" + functionName);
+				try {
+					Object result = reflectionMethod.invoke(null, arguments.toArray());
+					@SuppressWarnings("unchecked")
+					Pair<Type, String> subResult = (Pair<Type, String>) Pair.class.cast(result);
+					return subResult;
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+					throw new RuntimeException("This is probably a developer error.");
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+					throw new RuntimeException("This is probably a developer error.");
+				}
+			}
+		}
+		throw new NoSuchMethodException(String.format("No such function: %s", functionName));
 	}
 
-	private Pair<Type, String> ProcessPrimaryExpression(MethodPrimaryExpressionContext primaryExpression) throws UnknownTypeException, UnsupportedOperationException {
+	private Pair<Type, String> ProcessPrimaryExpression(MethodPrimaryExpressionContext primaryExpression) throws UnknownTypeException, UnsupportedOperationException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		if (!primaryExpression.intConstant().isEmpty()) {
 			IntConstantContext intConstant = primaryExpression.intConstant();
 			Type resultType = new Type();
@@ -932,7 +951,7 @@ public class MethodProgram {
 		throw new RuntimeException("Unreachable code (???)");
 	}	
 	
-	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) throws UnsupportedOperationException, UnknownTypeException {
+	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) throws UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		if (!expression.methodFunctionCall().isEmpty()) {
 			return ProcessFunctionCall(expression.methodFunctionCall());
 		}
@@ -947,7 +966,7 @@ public class MethodProgram {
 		throw new RuntimeException("Unreachable code (???)");
 	}
 
-	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException {
+	private void ProcessForEachLoop(MethodForEachLoopContext forEachLoop) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		MethodRangeContext context = forEachLoop.methodRange();
 		Integer start = Integer.parseInt(context.INT(0).getText());
 		Integer end = Integer.parseInt(context.INT(1).getText());
@@ -968,14 +987,14 @@ public class MethodProgram {
 		state.variables.remove(identifier);
 	}
 	
-	private void ProcessReturn(MethodReturnContext returnStatement) throws UnsupportedOperationException, UnknownTypeException {
+	private void ProcessReturn(MethodReturnContext returnStatement) throws UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		Pair<Type, String> expression = ProcessExpression(returnStatement.methodExpression());
 		state.returning = true;
 		state.returnValue = expression;
 		
 	}
 	
-	private void ProcessStatement(MethodStatementContext statement) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException {
+	private void ProcessStatement(MethodStatementContext statement) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		if (!statement.methodAssignment().isEmpty()) {
 			ProcessAssignment(statement.methodAssignment());
 		}
@@ -993,17 +1012,30 @@ public class MethodProgram {
 		}
 	}
 	
+	private void insertFunctions() {
+		functions.add(new Pair<String, Integer>("add", 2));
+		functions.add(new Pair<String, Integer>("sub", 2));
+		functions.add(new Pair<String, Integer>("mul", 2));
+		functions.add(new Pair<String, Integer>("div", 2));
+		functions.add(new Pair<String, Integer>("mod", 2));
+		functions.add(new Pair<String, Integer>("append", 1));
+		functions.add(new Pair<String, Integer>("index", 2));
+		functions.add(new Pair<String, Integer>("delete", 2));
+		functions.add(new Pair<String, Integer>("clear", 1));
+	}
+	
 	public MethodProgram(MethodProgramContext inputContext, List<Namespace> inputNamespaces,
 			List<Pair<Type, String>> parameters, Pair<Type, String> input) {
 		context = inputContext;
 		namespaces = inputNamespaces;
+		insertFunctions();
 	}
 
 	public MethodProgram() {
-		// TODO Auto-generated constructor stub
+		insertFunctions();
 	}
 	
-	public Pair<Type, String> Interpret(Pair<Type, String> input) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException {
+	public Pair<Type, String> Interpret(Pair<Type, String> input) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		state.variables.add(new Variable("input", input.getValue0(), input.getValue1()));
 		
 		List<MethodStatementContext> statements = context.methodStatement();
