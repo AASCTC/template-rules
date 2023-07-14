@@ -26,7 +26,7 @@ import com.aasctc.template_rules.Type;
 
 public class XMLMethodProgram extends MethodProgram {
     public XMLMethodProgram(MethodProgramContext context, List<Namespace> namespaces,
-			List<Pair<Type, String>> parameters, Pair<Type, String> input) {
+			List<VolatileVariable> parameters, VolatileVariable input) {
 		super(context, namespaces, parameters, input);
 	}
 
@@ -66,9 +66,9 @@ public class XMLMethodProgram extends MethodProgram {
         }
     }
 
-	public static Pair<Type, String> function_index(
-			Pair<Type, String> op,
-			Pair<Type, String> op2) throws IllegalArgumentException {
+	public static VolatileVariable function_index(
+			VolatileVariable op,
+			VolatileVariable op2) throws IllegalArgumentException {
 
 		if (!MethodProgram.isIntegerNumber(op2.getValue0())) {
 			throw new IllegalArgumentException("Second argument must be an integer");
@@ -80,16 +80,16 @@ public class XMLMethodProgram extends MethodProgram {
 			// extract the first node.
 			doc1.getChildNodes().item(index);
 			String result = XMLMethodProgram.convertXmlToString(doc1);
-			return new Pair<Type, String>(op.getValue0(), result);
+			return new VolatileVariable(op.getValue0(), result);
 		}
 		catch(RuntimeException e) {
 			throw new IllegalArgumentException("Failed to parse XML");
 		}
 	}
 
-	public static Pair<Type, String> function_delete(
-			Pair<Type, String> op,
-			Pair<Type, String> op2) throws IllegalArgumentException {
+	public static VolatileVariable function_delete(
+			VolatileVariable op,
+			VolatileVariable op2) throws IllegalArgumentException {
 
 		if (!MethodProgram.isIntegerNumber(op2.getValue0())) {
 			throw new IllegalArgumentException("Second argument must be an integer");
@@ -101,7 +101,7 @@ public class XMLMethodProgram extends MethodProgram {
 			// extract the first node.
 			doc1.removeChild(doc1.getChildNodes().item(index));
 			String result = XMLMethodProgram.convertXmlToString(doc1);
-			return new Pair<Type, String>(op.getValue0(), result);
+			return new VolatileVariable(op.getValue0(), result);
 		}
 		catch(RuntimeException e) {
 			throw new IllegalArgumentException("Failed to parse XML");

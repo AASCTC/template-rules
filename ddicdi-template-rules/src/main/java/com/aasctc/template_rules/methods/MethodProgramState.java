@@ -12,7 +12,7 @@ public class MethodProgramState {
 
 	public List<Variable> variables;
 	public boolean returning;
-	public Pair<Type, String> returnValue;
+	public VolatileVariable returnValue;
 	
 	public MethodProgramState() {
 		returning = false;

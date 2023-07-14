@@ -6,6 +6,7 @@ import org.javatuples.Pair;
 
 import com.aasctc.template_rules.methods.XMLMethodProgram;
 
+//TODO override the desired TemplateRules functions
 public class XMLMethod extends Method {
 	XMLMethodProgram xmlProgram;
 	

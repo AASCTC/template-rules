@@ -45,7 +45,7 @@ public class MethodProgram {
 	List<Namespace> namespaces;
 	MethodProgramState state;
 
-	public static Boolean isTrue(Pair<Type, String> variable) {
+	public static Boolean isTrue(VolatileVariable variable) {
 		BigDecimal d = new BigDecimal(variable.getValue1());
 		if (MethodProgram.isRealNumber(null) && d.compareTo(BigDecimal.ZERO) == 0) {
 			return false;
@@ -62,7 +62,7 @@ public class MethodProgram {
 	 * @param number A numerical structured element
 	 * @return A number with larger storage capacity.
 	 */
-	public static Type upgradeNumericalStorage(Pair<Type, String> number) {
+	public static Type upgradeNumericalStorage(VolatileVariable number) {
 		BigDecimal byteMin = new BigDecimal((long) Byte.MIN_VALUE);
 		BigDecimal byteMax = new BigDecimal((long) Byte.MAX_VALUE);
 		BigDecimal shortMin = new BigDecimal(Short.MIN_VALUE);
@@ -617,66 +617,66 @@ public class MethodProgram {
 		return false;
 	}
 	
-	public static Pair<Type, String> function_add(
-			Pair<Type, String> op,
-			Pair<Type, String> op2) throws IllegalArgumentException {
+	public static VolatileVariable function_add(
+			VolatileVariable op,
+			VolatileVariable op2) throws IllegalArgumentException {
 		if (MethodProgram.isRealNumber(op.getValue0()) &&
 				MethodProgram.isRealNumber(op2.getValue0())) {
 			String result = new BigDecimal(op.getValue1()).add(
 					new BigDecimal(op2.getValue1())).toString();
 			
 			Type resultType = MethodProgram.upgradeNumericalStorage(
-					new Pair<Type, String>(MethodProgram.resultType(
+					new VolatileVariable(MethodProgram.resultType(
 							op.getValue0(), op.getValue0()),
 							result));
-			return new Pair<Type, String>(resultType, result);
+			return new VolatileVariable(resultType, result);
 		}
 		else {
 			throw new IllegalArgumentException("This function is not valid for these types.");
 		}
 	}
 	
-	public static Pair<Type, String> function_sub(
-			Pair<Type, String> op,
-			Pair<Type, String> op2) throws IllegalArgumentException {
+	public static VolatileVariable function_sub(
+			VolatileVariable op,
+			VolatileVariable op2) throws IllegalArgumentException {
 		if (MethodProgram.isRealNumber(op.getValue0()) &&
 				MethodProgram.isRealNumber(op2.getValue0())) {
 			String result = new BigDecimal(op.getValue1()).subtract(
 					new BigDecimal(op2.getValue1())).toString();
 			
 			Type resultType = MethodProgram.upgradeNumericalStorage(
-					new Pair<Type, String>(MethodProgram.resultType(
+					new VolatileVariable(MethodProgram.resultType(
 							op.getValue0(), op.getValue0()),
 							result));
-			return new Pair<Type, String>(resultType, result);
+			return new VolatileVariable(resultType, result);
 		}
 		else {
 			throw new IllegalArgumentException("This function is not valid for these types.");
 		}
 	}
 	
-	public static Pair<Type, String> function_mul(
-			Pair<Type, String> op,
-			Pair<Type, String> op2) throws IllegalArgumentException {
+	public static VolatileVariable function_mul(
+			VolatileVariable op,
+			VolatileVariable op2) throws IllegalArgumentException {
 		if (MethodProgram.isRealNumber(op.getValue0()) &&
 				MethodProgram.isRealNumber(op2.getValue0())) {
 			String result = new BigDecimal(op.getValue1()).multiply(
 					new BigDecimal(op2.getValue1())).toString();
 			
 			Type resultType = MethodProgram.upgradeNumericalStorage(
-					new Pair<Type, String>(MethodProgram.resultType(
+					new VolatileVariable(MethodProgram.resultType(
 							op.getValue0(), op.getValue0()),
 							result));
-			return new Pair<Type, String>(resultType, result);
+			return new VolatileVariable(resultType, result);
 		}
 		else {
 			throw new IllegalArgumentException("This function is not valid for these types.");
 		}
 	}
 	
-	public static Pair<Type, String> function_div(
-			Pair<Type, String> op,
-			Pair<Type, String> op2) throws IllegalArgumentException {
+	public static VolatileVariable function_div(
+			VolatileVariable op,
+			VolatileVariable op2) throws IllegalArgumentException {
 		try {
 			if (MethodProgram.isRealNumber(op.getValue0()) &&
 					MethodProgram.isRealNumber(op2.getValue0())) {
@@ -684,10 +684,10 @@ public class MethodProgram {
 						new BigDecimal(op2.getValue1())).toString();
 				
 				Type resultType = MethodProgram.upgradeNumericalStorage(
-						new Pair<Type, String>(MethodProgram.resultType(
+						new VolatileVariable(MethodProgram.resultType(
 								op.getValue0(), op.getValue0()),
 								result));
-				return new Pair<Type, String>(resultType, result);
+				return new VolatileVariable(resultType, result);
 			}
 			else {
 				throw new IllegalArgumentException("This function is not valid for these types.");
@@ -698,9 +698,9 @@ public class MethodProgram {
 		}
 	}
 	
-	public static Pair<Type, String> function_mod(
-			Pair<Type, String> op,
-			Pair<Type, String> op2) throws IllegalArgumentException {
+	public static VolatileVariable function_mod(
+			VolatileVariable op,
+			VolatileVariable op2) throws IllegalArgumentException {
 		try {
 			if (MethodProgram.isIntegerNumber(op.getValue0()) &&
 					MethodProgram.isIntegerNumber(op2.getValue0())) {
@@ -708,10 +708,10 @@ public class MethodProgram {
 						new BigDecimal(op2.getValue1())).toString();
 				
 				Type resultType = MethodProgram.upgradeNumericalStorage(
-						new Pair<Type, String>(MethodProgram.resultType(
+						new VolatileVariable(MethodProgram.resultType(
 								op.getValue0(), op.getValue0()),
 								result));
-				return new Pair<Type, String>(resultType, result);
+				return new VolatileVariable(resultType, result);
 			}
 			else {
 				throw new IllegalArgumentException("This function is not valid for these types.");
@@ -722,22 +722,22 @@ public class MethodProgram {
 		}
 	}
 	
-	public static Pair<Type, String> function_append(
-			Pair<Type, String> op,
-			Pair<Type, String> op2) throws IllegalArgumentException {
+	public static VolatileVariable function_append(
+			VolatileVariable op,
+			VolatileVariable op2) throws IllegalArgumentException {
 
 		if (op.getValue0() != op2.getValue0()) {
 			throw new IllegalArgumentException("Arguments must have the same type");
 		}
 		String result = op.getValue1() + op2.getValue1();
 		
-		return new Pair<Type, String>(op.getValue0(), result);
+		return new VolatileVariable(op.getValue0(), result);
 	}
 	
 
-	public static Pair<Type, String> function_index(
-			Pair<Type, String> op,
-			Pair<Type, String> op2) throws IllegalArgumentException {
+	public static VolatileVariable function_index(
+			VolatileVariable op,
+			VolatileVariable op2) throws IllegalArgumentException {
 
 		if (!MethodProgram.isIntegerNumber(op2.getValue0())) {
 			throw new IllegalArgumentException("Second argument must be an integer");
@@ -747,18 +747,18 @@ public class MethodProgram {
 			// We should not be doing this. We have to consider this as XML and
 			// extract the first node.
 			String result = String.valueOf(op.getValue1().charAt(index));
-			return new Pair<Type, String>(op.getValue0(), result);
+			return new VolatileVariable(op.getValue0(), result);
 		}
 		catch(NumberFormatException | IndexOutOfBoundsException e) {
 			throw new IllegalArgumentException("Bad array index");
 		}
 	}
 
-	public static Pair<Type, String> function_clear(
-			Pair<Type, String> op) throws IllegalArgumentException {
+	public static VolatileVariable function_clear(
+			VolatileVariable op) throws IllegalArgumentException {
 		try {
 			String result = "";
-			return new Pair<Type, String>(op.getValue0(), result);
+			return new VolatileVariable(op.getValue0(), result);
 		}
 		catch(StringIndexOutOfBoundsException e) {
 			throw new IllegalArgumentException("Bad array index");
@@ -777,7 +777,7 @@ public class MethodProgram {
 			throw new IllegalAssignmentException("Unknown type of variable");
 		}
 		
-		Pair<Type, String> value = ProcessExpression(assignment.methodExpression());
+		VolatileVariable value = ProcessExpression(assignment.methodExpression());
 		newVariable = new Variable(variableName, type, value.getValue1());
 		
 		for (Variable variable: state.variables) {
@@ -802,7 +802,7 @@ public class MethodProgram {
 
 	private void ProcessConditional(MethodConditionalContext conditional) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		MethodIfBlockContext ifContext = conditional.methodIfBlock();
-		Pair<Type, String> ifExpression = ProcessExpression(ifContext.methodExpression());
+		VolatileVariable ifExpression = ProcessExpression(ifContext.methodExpression());
 		if (isTrue(ifExpression)) {
 			for (MethodStatementContext statement: ifContext.methodStatement()) {
 				ProcessStatement(statement);
@@ -813,7 +813,7 @@ public class MethodProgram {
 			return;
 		}
 		for (MethodElseIfBlockContext elseifContext: conditional.methodElseIfBlock()) {
-			Pair<Type, String> elseifExpression = ProcessExpression(elseifContext.methodExpression());
+			VolatileVariable elseifExpression = ProcessExpression(elseifContext.methodExpression());
 			if (isTrue(elseifExpression)) {
 				for (MethodStatementContext statement: elseifContext.methodStatement()) {
 					ProcessStatement(statement);
@@ -849,8 +849,8 @@ public class MethodProgram {
 		throw new UnknownTypeException("Unknown namespace for type");
 	}
 
-	private Pair<Type, String> ProcessFunctionCall(MethodFunctionCallContext functionCall) throws InvocationTargetException, UnsupportedOperationException, UnknownTypeException, NoSuchMethodException, SecurityException {
-		List<Pair<Type, String>> arguments = new ArrayList<Pair<Type, String>>();
+	private VolatileVariable ProcessFunctionCall(MethodFunctionCallContext functionCall) throws InvocationTargetException, UnsupportedOperationException, UnknownTypeException, NoSuchMethodException, SecurityException {
+		List<VolatileVariable> arguments = new ArrayList<VolatileVariable>();
 		for (MethodExpressionContext expression: functionCall.methodArgumentList().methodExpression()) {
 			arguments.add(ProcessExpression(expression));
 		}
@@ -869,8 +869,7 @@ public class MethodProgram {
 				Method reflectionMethod = reflectionClass.getMethod("function_" + functionName);
 				try {
 					Object result = reflectionMethod.invoke(null, arguments.toArray());
-					@SuppressWarnings("unchecked")
-					Pair<Type, String> subResult = (Pair<Type, String>) Pair.class.cast(result);
+					VolatileVariable subResult = VolatileVariable.class.cast(result);
 					return subResult;
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
@@ -884,7 +883,7 @@ public class MethodProgram {
 		throw new NoSuchMethodException(String.format("No such function: %s", functionName));
 	}
 
-	private Pair<Type, String> ProcessPrimaryExpression(MethodPrimaryExpressionContext primaryExpression) throws UnknownTypeException, UnsupportedOperationException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	private VolatileVariable ProcessPrimaryExpression(MethodPrimaryExpressionContext primaryExpression) throws UnknownTypeException, UnsupportedOperationException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		if (!primaryExpression.intConstant().isEmpty()) {
 			IntConstantContext intConstant = primaryExpression.intConstant();
 			Type resultType = new Type();
@@ -901,7 +900,7 @@ public class MethodProgram {
 			catch (NumberFormatException e) {
 				throw new UnknownTypeException("Int constant is not an integer");
 			}
-			return new Pair<Type, String>(resultType, intConstant.INT().getText());
+			return new VolatileVariable(resultType, intConstant.INT().getText());
 		}
 		else if (!primaryExpression.floatConstant().isEmpty()) {
 			FloatConstantContext floatConstant = primaryExpression.floatConstant();
@@ -920,7 +919,7 @@ public class MethodProgram {
 			catch (NumberFormatException e) {
 				throw new UnknownTypeException("Float constant is not an floating-point number");
 			}
-			return new Pair<Type, String>(resultType, floatConstant.FLOAT().getText());
+			return new VolatileVariable(resultType, floatConstant.FLOAT().getText());
 		}
 		else if (!primaryExpression.stringConstant().isEmpty()) {
 			StringConstantContext stringConstant = primaryExpression.stringConstant();
@@ -933,13 +932,13 @@ public class MethodProgram {
 				resultType = ProcessMethodType(stringConstant.methodType());
 				
 			}
-			return new Pair<Type, String>(resultType, stringConstant.STRING().getText());
+			return new VolatileVariable(resultType, stringConstant.STRING().getText());
 		}
 		else if (primaryExpression.IDENTIFIER().getText() != "") {
 			String name = primaryExpression.IDENTIFIER().getText();			
 			for (Variable variable: state.variables) {
 				if (variable.name == name) {
-					return new Pair<Type, String>(variable.type, variable.value);
+					return new VolatileVariable(variable.type, variable.value);
 				}
 			}
 			throw new UnknownTypeException(String.format("Unknown variable \"%s\"", name));
@@ -951,7 +950,7 @@ public class MethodProgram {
 		throw new RuntimeException("Unreachable code (???)");
 	}	
 	
-	private Pair<Type, String> ProcessExpression(MethodExpressionContext expression) throws UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	private VolatileVariable ProcessExpression(MethodExpressionContext expression) throws UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		if (!expression.methodFunctionCall().isEmpty()) {
 			return ProcessFunctionCall(expression.methodFunctionCall());
 		}
@@ -988,7 +987,7 @@ public class MethodProgram {
 	}
 	
 	private void ProcessReturn(MethodReturnContext returnStatement) throws UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		Pair<Type, String> expression = ProcessExpression(returnStatement.methodExpression());
+		VolatileVariable expression = ProcessExpression(returnStatement.methodExpression());
 		state.returning = true;
 		state.returnValue = expression;
 		
@@ -1025,7 +1024,7 @@ public class MethodProgram {
 	}
 	
 	public MethodProgram(MethodProgramContext inputContext, List<Namespace> inputNamespaces,
-			List<Pair<Type, String>> parameters, Pair<Type, String> input) {
+			List<VolatileVariable> parameters, VolatileVariable input) {
 		context = inputContext;
 		namespaces = inputNamespaces;
 		insertFunctions();
@@ -1035,7 +1034,7 @@ public class MethodProgram {
 		insertFunctions();
 	}
 	
-	public Pair<Type, String> Interpret(Pair<Type, String> input) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	public VolatileVariable Interpret(VolatileVariable input) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		state.variables.add(new Variable("input", input.getValue0(), input.getValue1()));
 		
 		List<MethodStatementContext> statements = context.methodStatement();
@@ -1043,7 +1042,7 @@ public class MethodProgram {
 			ProcessStatement(statement);
 		}
 	
-		Pair<Type, String> returnValue = state.returnValue;
+		VolatileVariable returnValue = state.returnValue;
 		return returnValue;
 	}
 }
