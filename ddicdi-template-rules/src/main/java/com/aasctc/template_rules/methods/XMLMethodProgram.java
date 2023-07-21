@@ -24,8 +24,8 @@ import com.aasctc.template_rules.Namespace;
 
 public class XMLMethodProgram extends MethodProgram {
     public XMLMethodProgram(MethodProgramContext context, List<Namespace> namespaces,
-			List<VolatileVariable> parameters, VolatileVariable input) {
-		super(context, namespaces, parameters, input);
+			List<Variable> parameters) {
+		super(context, namespaces, parameters);
 	}
 
 	private static String convertXmlToString(Document doc) {

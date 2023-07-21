@@ -17,6 +17,7 @@ import com.aasctc.template_rules.antlr.TemplateRulesLexer;
 import com.aasctc.template_rules.antlr.TemplateRulesParser;
 import com.aasctc.template_rules.antlr.TemplateRulesParser.*;
 import com.aasctc.template_rules.methods.XMLMethodProgram;
+import com.aasctc.template_rules.methods.Variable;
 
 /**
  * @author Ali Sherief
@@ -74,13 +75,17 @@ public class TemplateRulesGrammar {
         for (MethodContext method: template.methods().method()) {        	
         	try {
         		Type t = new Type(method.methodType().getText(), namespaces);
-        		List<String> parameters = new ArrayList<String>();
-				method.methodParameters().methodParameter().forEach(
-						parameter -> parameters.add(parameter.getText()));
+        		List<Variable> parameters = new ArrayList<Variable>();
+        		Integer i = 1;
+        		for (MethodParameterContext parameter: method.methodParameters().methodParameter()) {
+        			String parameterName = String.format("parameter%d", i);
+        			Type pt = new Type(parameter.methodParameterType().getText(), namespaces);
+        			Variable v = new Variable(parameterName, pt, parameter.methodParameterValue().getText());
+        		}
 
 				methods.add(new XMLMethod(
 						method.methodName().getText(), t,
-						parameters, new XMLMethodProgram(method.methodProgram())));
+						parameters, namespaces, method.methodProgram()));
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 				throw e;

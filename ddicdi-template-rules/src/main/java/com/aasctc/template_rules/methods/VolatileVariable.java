@@ -2,7 +2,7 @@ package com.aasctc.template_rules.methods;
 
 import com.aasctc.template_rules.Type;
 
-class VolatileVariable {
+public class VolatileVariable {
 	public Type type;
 	public String value;
 	

@@ -2,7 +2,7 @@ package com.aasctc.template_rules.methods;
 
 import com.aasctc.template_rules.Type;
 
-class Variable {
+public class Variable {
 	public String name;
 	public Type type;
 	public String value;

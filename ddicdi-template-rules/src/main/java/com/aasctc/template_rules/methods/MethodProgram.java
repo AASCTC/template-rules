@@ -43,6 +43,7 @@ public class MethodProgram {
 	
 	MethodProgramContext context;
 	List<Namespace> namespaces;
+	List<Variable> parameters;
 	MethodProgramState state;
 
 	public static Boolean isTrue(VolatileVariable variable) {
@@ -1024,9 +1025,10 @@ public class MethodProgram {
 	}
 	
 	public MethodProgram(MethodProgramContext inputContext, List<Namespace> inputNamespaces,
-			List<VolatileVariable> parameters, VolatileVariable input) {
+			List<Variable> inputParameters) {
 		context = inputContext;
 		namespaces = inputNamespaces;
+		parameters = inputParameters;
 		insertFunctions();
 	}
 
@@ -1035,6 +1037,7 @@ public class MethodProgram {
 	}
 	
 	public VolatileVariable Interpret(VolatileVariable input) throws IllegalAssignmentException, UnsupportedOperationException, UnknownTypeException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		state.variables = parameters;
 		state.variables.add(new Variable("input", input.getValue0(), input.getValue1()));
 		
 		List<MethodStatementContext> statements = context.methodStatement();
