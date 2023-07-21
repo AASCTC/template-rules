@@ -81,6 +81,7 @@ public class TemplateRulesGrammar {
         			String parameterName = String.format("parameter%d", i);
         			Type pt = new Type(parameter.methodParameterType().getText(), namespaces);
         			Variable v = new Variable(parameterName, pt, parameter.methodParameterValue().getText());
+        			parameters.add(v);
         		}
 
 				methods.add(new XMLMethod(
