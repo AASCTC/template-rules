@@ -1,19 +1,23 @@
 package com.aasctc.template_rules;
 
 public class Namespace {
-	public String name;
-	public String alias;
-	public Namespace() {
-		name = "";
-		alias = "";
+	private String path;
+	private String alias;
+	
+	public Namespace() {}
+	
+	public String getPath() {
+		return path;
 	}
-	public Namespace(String inputName, String inputAlias) {
-		name = inputName;
-		alias = inputAlias;
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+	public void setAlias(String alias) {
+		this.alias = alias;
 	}
 	
-	public Namespace(String inputName) {
-		name = inputName;
-		alias = inputName;
-	}
-} 
+}

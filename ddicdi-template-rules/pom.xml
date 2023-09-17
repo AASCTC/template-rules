@@ -1,18 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.aasctc</groupId>
-  <artifactId>ddicdi-template-rules</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>DDI-CDI Template Rules</name>
+    <groupId>com.aasctc</groupId>
+    <artifactId>template_rules</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>DDI-CDI Template Rules</name>
   <description>Compiles DDI-CDI Transformation Rules into XSLT</description>
   <build>
 	  <plugins>
 	      <plugin>
 	          <groupId>org.antlr</groupId>
 	          <artifactId>antlr4-maven-plugin</artifactId>
-	          <version>4.13.0</version>
+	          <version>4.9.2</version>
 	          <executions>
 	              <execution>
+					  <id>antlr</id>
 	                  <goals>
 	                      <goal>antlr4</goal>
 	                  </goals>
@@ -21,12 +22,7 @@
 	          <configuration>
 	              <arguments>
 	                  <argument>-visitor</argument>
-	                  <argument>-no-listener</argument>
-	                  <argument>-package</argument>
-	                  <argument>com.aasctc.template_rules.antlr</argument>
 	              </arguments>
-	              <outputDirectory>src/main/generated-sources/antlr4</outputDirectory>
-	              <!-- TODO it's stuck in the defualt package for some reason. -->
 	          </configuration>
 	      </plugin>
 	  </plugins>
@@ -48,35 +44,30 @@
           <version>12.2</version>
       </dependency>
       <dependency>
-	      <groupId>org.apache.logging.log4j</groupId>
-	      <artifactId>log4j-api</artifactId>
-	      <version>2.20.0</version>
+	      <groupId>commons-validator</groupId>
+	      <artifactId>commons-validator</artifactId>
+	      <version>1.4.1</version>
 	  </dependency>
-	  <dependency>
-	      <groupId>org.apache.logging.log4j</groupId>
-	      <artifactId>log4j-core</artifactId>
-	      <version>2.17.2</version>
-	  </dependency>
-	  <dependency>
-        <groupId>org.javatuples</groupId>
-        <artifactId>javatuples</artifactId>
-        <version>1.2</version>
-        <scope>compile</scope>
-      </dependency>
-      <dependency>
-		<groupId>com.google.code.findbugs</groupId>
-		<artifactId>jsr305</artifactId>
-		<version>3.0.2</version>
-      </dependency>
 	  <dependency>
 	    <groupId>org.springframework.boot</groupId>
 	    <artifactId>spring-boot-starter</artifactId>
-	    <version>3.1.1</version>
+	    <version>3.1.3</version>
+	      <exclusions>
+            <exclusion>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-logging</artifactId>
+            </exclusion>
+        </exclusions>
 	  </dependency>
 	  <dependency>
 	    <groupId>org.springframework.boot</groupId>
 	    <artifactId>spring-boot-starter-web</artifactId>
-	    <version>3.1.1</version>
+	    <version>3.1.3</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-log4j2</artifactId>
+	    <version>3.1.3</version>
 	</dependency>
   </dependencies>
   <organization>

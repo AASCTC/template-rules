@@ -1,0 +1,25 @@
+// Copyright 2023 We Did It, Inc.
+crossdomain {
+    name: "Example Domain Coupling"
+    date: "2023-09-10"
+    description: "Demonstrates an example of a domain coupling DSL."
+    authors: [
+        "Hussein Sherief" [hussein.sherief@gmail.com],
+        "Ali Sherief" [alihsherief@yahoo.com]
+    ]
+}
+
+namespaces {
+    <http://www.wikidata.org/entity/> : wd
+}
+
+methods {
+    add: void add(int a);
+}
+
+couplings {
+    add "/output/path" [
+        "/input/path/1",
+        "/input/path/2"
+    ]
+}
