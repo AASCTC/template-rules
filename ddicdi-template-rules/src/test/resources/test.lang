@@ -13,10 +13,6 @@ namespaces {
     <http://www.wikidata.org/entity/> : wd
 }
 
-methods {
-    add: void add(int a);
-}
-
 couplings {
     add "/output/path" [
         "/input/path/1",

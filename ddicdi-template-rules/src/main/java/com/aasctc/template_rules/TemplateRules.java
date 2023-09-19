@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -17,6 +18,8 @@ public class TemplateRules {
     private static final String DIRBASE = "src/test/resources/";
 
     private static final Logger logger = LogManager.getLogger(TemplateRules.class);
+    
+    private static Optional<String> outputFilePath;
 
     private static void printHelp(Options options) {
         HelpFormatter formatter = new HelpFormatter();
@@ -62,13 +65,6 @@ public class TemplateRules {
             return;
         }
 
-        if (!cmd.hasOption("o")) {
-        	logger.error("--output is required but not specified.");
-        	printHelp(options);
-        	return;
-        }
-
-
         else if (!cmd.hasOption("r")) {
         	logger.error("--rules is required but not specified.");
         	printHelp(options);
@@ -77,24 +73,22 @@ public class TemplateRules {
             
         // Get the file paths
         List<String> inputFilesPath = cmd.getArgList();
-        String outputFilePath = cmd.getOptionValue("o");
+        try {
+        	outputFilePath = Optional.of(cmd.getOptionValue("o"));
+        }
+        catch (NullPointerException e) {
+        	outputFilePath = Optional.empty();
+        }
         String rulesFilePath = cmd.getOptionValue("r");
 	
-    	
-        String files[] = args.length==0? new String[]{ "test." + EXTENSION } : args;
         System.out.println("Dirbase: " + DIRBASE);
-        for (String file : files){
-            System.out.println("START: " + file);
 
-            CharStream in = CharStreams.fromFileName(DIRBASE + file);
-            TemplateRulesLexer lexer = new TemplateRulesLexer(in);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            TemplateRulesParser parser = new TemplateRulesParser(tokens);
-            TemplateRulesParser.CompilationUnitContext tree = parser.compilationUnit();
-            TemplateRulesCustomVisitor visitor = new TemplateRulesCustomVisitor();
-            visitor.visit(tree);
-
-            System.out.println("FINISH: " + file);
-        }
+        CharStream in = CharStreams.fromFileName(DIRBASE + rulesFilePath);
+        TemplateRulesLexer lexer = new TemplateRulesLexer(in);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        TemplateRulesParser parser = new TemplateRulesParser(tokens);
+        TemplateRulesParser.CompilationUnitContext tree = parser.compilationUnit();
+        TemplateRulesCustomVisitor visitor = new TemplateRulesCustomVisitor();
+        visitor.visit(tree);
     }
 }
