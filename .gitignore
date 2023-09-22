@@ -1,2 +1,4 @@
 *.jar
 *.log
+ddicdi-template-rules/data/*
+ddicdi-template-rules/input/*
