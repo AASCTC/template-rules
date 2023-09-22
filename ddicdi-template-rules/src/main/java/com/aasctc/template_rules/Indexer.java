@@ -1,4 +1,4 @@
-package com.aasctc.template_rules.index;
+package com.aasctc.template_rules;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -26,17 +26,18 @@ public class Indexer {
 	 */
     public static void indexXMLDocuments(List<String> indexFilesFolders) {
     	Path rootPath = Paths.get(System.getProperty("user.dir"));
-        for (String indexFileFolder: indexFilesFolders) {
-        	Path indexPath = Paths.get(indexFileFolder);
-        	if (!indexPath.normalize().startsWith(rootPath.normalize())) {
-        		throw new SecurityException("Input files must be inside the current working directory.;");
-        	}
-        	
-            try {
-                Directory directory = FSDirectory.open(indexPath);
-                StandardAnalyzer analyzer = new StandardAnalyzer();
-                IndexWriterConfig config = new IndexWriterConfig(analyzer);
-                IndexWriter indexWriter = new IndexWriter(directory, config);
+
+        try {
+            Directory directory = FSDirectory.open(Paths.get("data/lucene"));
+            StandardAnalyzer analyzer = new StandardAnalyzer();
+            IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            IndexWriter indexWriter = new IndexWriter(directory, config);
+
+            for (String indexFileFolder: indexFilesFolders) {
+	        	Path indexPath = Paths.get(indexFileFolder);
+	        	if (!indexPath.normalize().startsWith(rootPath.normalize())) {
+	        		throw new SecurityException("Input files must be inside the current working directory.");
+	        	}
 
                 // Check if indexPath is a directory
                 if (Files.isDirectory(indexPath)) {
@@ -75,9 +76,9 @@ public class Indexer {
                 indexWriter.close();
 
                 System.out.println("Indexing complete.");
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

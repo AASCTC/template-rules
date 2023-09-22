@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,8 +38,8 @@ public class TemplateRules {
         options.addOption("h", "help", false, "Print the help message");
         options.addOption("v", "version", false, "Print the version information");
         options.addOption("r", "rules", true, "Input template rules file");
-        options.addOption("o", "output", true, "Output XML file path");
         options.addOption("s", "server", false, "Start the Spring Boot server");
+        options.addOption("",  "init-only", false, "Initialize the repository indexer only");
 
         // Create the command-line parser
         CommandLineParser cliParser = new DefaultParser();
@@ -64,6 +65,13 @@ public class TemplateRules {
             printVersion();
             return;
         }
+        
+        else if (cmd.hasOption("init-only")) {
+        	logger.info("Please wait while the database is initialized...");
+        	LabelTranslator lt = new LabelTranslator();
+        	logger.info("Database initialization complete.");
+        	return;
+        }
 
         else if (!cmd.hasOption("r")) {
         	logger.error("--rules is required but not specified.");
@@ -72,13 +80,8 @@ public class TemplateRules {
         }
             
         // Get the file paths
-        List<String> inputFilesPath = cmd.getArgList();
-        try {
-        	outputFilePath = Optional.of(cmd.getOptionValue("o"));
-        }
-        catch (NullPointerException e) {
-        	outputFilePath = Optional.empty();
-        }
+        List<String> inputFilesPath = cmd.getArgList(); //FIXME it is specified in the rules file.
+        // Also remove the reference to output files path inside the rules file.
         String rulesFilePath = cmd.getOptionValue("r");
 	
         System.out.println("Dirbase: " + DIRBASE);
@@ -90,5 +93,9 @@ public class TemplateRules {
         TemplateRulesParser.CompilationUnitContext tree = parser.compilationUnit();
         TemplateRulesCustomVisitor visitor = new TemplateRulesCustomVisitor();
         visitor.visit(tree);
+        
+        List<String> fileFolderList = new ArrayList<String>();
+        fileFolderList.add(System.getProperty("user.dir") + "/input");
+        Indexer.indexXMLDocuments(fileFolderList);
     }
 }
