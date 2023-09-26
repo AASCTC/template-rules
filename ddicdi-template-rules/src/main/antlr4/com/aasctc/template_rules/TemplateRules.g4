@@ -32,7 +32,7 @@ grammar TemplateRules;
 
 
 compilationUnit
-    :   crossDomainHeader crossDomainNamespaces crossDomainCouplings EOF
+    :   crossDomainHeader crossDomainNamespaces crossDomainFiles EOF
     ;
 
 LeftParen : '(';
@@ -373,13 +373,10 @@ crossDomainNamespaces
 crossDomainNamespace
 	:	NamespaceLiteral Colon namespaceAliasLiteral ;
 
-crossDomainCouplings
-	:	'couplings' '{' crossDomainCoupling (Comma crossDomainCoupling)* '}' ;
+crossDomainFiles
+	:	'files' '[' crossDomainFile (Comma crossDomainFile)* ']' ;
 
-crossDomainCoupling
-	:	Identifier StringLiteral '[' crossDomainCouplingInputs ']' ;	
-
-crossDomainCouplingInputs
+crossDomainFile
 	:	StringLiteral (Comma StringLiteral)* ;
 
 Whitespace

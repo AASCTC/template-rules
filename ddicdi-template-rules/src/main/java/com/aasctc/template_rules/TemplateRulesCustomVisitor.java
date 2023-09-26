@@ -15,14 +15,14 @@ public class TemplateRulesCustomVisitor extends TemplateRulesBaseVisitor<Object>
 	private String description;
 	private List<Author> authors;
 	private List<Namespace> namespaces;
-	private List<Coupling> couplings;
+	private List<String> files;
 	
 	
 	public TemplateRulesCustomVisitor() {
 		super();
 		this.authors = new ArrayList<Author>();
 		this.namespaces = new ArrayList<Namespace>();
-		this.couplings = new ArrayList<Coupling>();
+		this.files = new ArrayList<String>();
 	}
 
 
@@ -75,13 +75,13 @@ public class TemplateRulesCustomVisitor extends TemplateRulesBaseVisitor<Object>
 		this.namespaces = namespaces;
 	}
 
-	public List<Coupling> getCouplings() {
-		return couplings;
+	public List<String> getFiles() {
+		return files;
 	}
 
 
-	public void setCouplings(List<Coupling> couplings) {
-		this.couplings = couplings;
+	public void setFiles(List<String> files) {
+		this.files = files;
 	}
 
 	@Override public Object visitCrossDomainHeaderName(TemplateRulesParser.CrossDomainHeaderNameContext ctx) {
@@ -134,17 +134,13 @@ public class TemplateRulesCustomVisitor extends TemplateRulesBaseVisitor<Object>
 		return visitChildren(ctx);
 	}
 	
-	@Override public Object visitCrossDomainCoupling(TemplateRulesParser.CrossDomainCouplingContext ctx) {
-		Coupling coupling = new Coupling();
-		coupling.setFunctionName(ctx.Identifier().getText());
-		coupling.setOutputXPath(ctx.StringLiteral().getText());
-		List<String> inputXPaths = new ArrayList<String>();
-		for (TerminalNode node: ctx.crossDomainCouplingInputs().StringLiteral()) {
-			String inputXPath = node.getText();
-			inputXPaths.add(inputXPath);
+	@Override public Object visitCrossDomainFile(TemplateRulesParser.CrossDomainFileContext ctx) {
+		List<String> inputFiles = new ArrayList<String>();
+		for (TerminalNode node: ctx.StringLiteral()) {
+			String inputFile = node.getText();
+			inputFiles.add(inputFile);
 		}
-		coupling.setInputXPaths(inputXPaths);
-		this.couplings.add(coupling);
+		setFiles(inputFiles);
 		return visitChildren(ctx);
 	}
 	

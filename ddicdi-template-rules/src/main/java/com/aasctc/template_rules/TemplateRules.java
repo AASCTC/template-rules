@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,12 +16,9 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 public class TemplateRules {
 
-    private static final String EXTENSION = "lang";
     private static final String DIRBASE = "src/test/resources/";
 
     private static final Logger logger = LogManager.getLogger(TemplateRules.class);
-    
-    private static Optional<String> outputFilePath;
 
     private static void printHelp(Options options) {
         HelpFormatter formatter = new HelpFormatter();
@@ -32,14 +30,13 @@ public class TemplateRules {
         System.out.println("TemplateInterpreter version " + version);
     }
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         // Create the command-line options
         Options options = new Options();
         options.addOption("h", "help", false, "Print the help message");
         options.addOption("v", "version", false, "Print the version information");
-        options.addOption("r", "rules", true, "Input template rules file");
-        options.addOption("s", "server", false, "Start the Spring Boot server");
-        options.addOption("",  "init-only", false, "Initialize the repository indexer only");
+        options.addOption("",  "index", true, "Populate the cross-domain files into the Lucene index");
+        options.addOption("", "preprocess", false, "Preprocess each XMLNS type into an SQLite database (pre-index)");
 
         // Create the command-line parser
         CommandLineParser cliParser = new DefaultParser();
@@ -66,36 +63,37 @@ public class TemplateRules {
             return;
         }
         
-        else if (cmd.hasOption("init-only")) {
+        else if (cmd.hasOption("index")) {
+        	String rulesFilePath = cmd.getOptionValue("index");
+        	
+        	CharStream in = CharStreams.fromFileName(DIRBASE + rulesFilePath);
+            TemplateRulesLexer lexer = new TemplateRulesLexer(in);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            TemplateRulesParser parser = new TemplateRulesParser(tokens);
+            TemplateRulesParser.CompilationUnitContext tree = parser.compilationUnit();
+            TemplateRulesCustomVisitor visitor = new TemplateRulesCustomVisitor();
+            visitor.visit(tree);
+            
+            List<String> fileFolderList = visitor.getFiles();
+            Indexer indexer = new Indexer();
+            indexer.indexXMLDocuments(fileFolderList);
+        }
+        
+        else if (cmd.hasOption("preprocess")) {
         	logger.info("Please wait while the database is initialized...");
-        	LabelTranslator lt = new LabelTranslator();
+        	new LabelTranslator();
         	logger.info("Database initialization complete.");
         	return;
         }
-
-        else if (!cmd.hasOption("r")) {
-        	logger.error("--rules is required but not specified.");
-        	printHelp(options);
-        	return;
-        }
-            
-        // Get the file paths
-        List<String> inputFilesPath = cmd.getArgList(); //FIXME it is specified in the rules file.
-        // Also remove the reference to output files path inside the rules file.
-        String rulesFilePath = cmd.getOptionValue("r");
-	
-        System.out.println("Dirbase: " + DIRBASE);
-
-        CharStream in = CharStreams.fromFileName(DIRBASE + rulesFilePath);
-        TemplateRulesLexer lexer = new TemplateRulesLexer(in);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        TemplateRulesParser parser = new TemplateRulesParser(tokens);
-        TemplateRulesParser.CompilationUnitContext tree = parser.compilationUnit();
-        TemplateRulesCustomVisitor visitor = new TemplateRulesCustomVisitor();
-        visitor.visit(tree);
         
-        List<String> fileFolderList = new ArrayList<String>();
-        fileFolderList.add(System.getProperty("user.dir") + "/input");
-        Indexer.indexXMLDocuments(fileFolderList);
+        else {
+        	// Start the Spring Boot Application
+        	TemplateRulesWebServer.main(args);
+        }
+        	
+        //  List<String> fileFolderList = new ArrayList<String>();
+        //  fileFolderList.add(System.getProperty("user.dir") + "/input");
+        //  Indexer indexer = new Indexer();
+        //  indexer.indexXMLDocuments(fileFolderList);
     }
 }

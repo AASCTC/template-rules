@@ -16,15 +16,33 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public class Indexer {
+	
+    private static final String DATABASE_URL = "jdbc:sqlite:data/database.db";
+    Connection databaseConnection;
+    
+    public Indexer() throws SQLException {
+    	databaseConnection = getConnection();
+    }
+    
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(DATABASE_URL);
+    }
+    
+    
 	/**
 	 * 
 	 * @param indexFilesFolders A list of files to index, or folders
 	 * containing files to index, or both.
 	 */
-    public static void indexXMLDocuments(List<String> indexFilesFolders) {
+    public void indexXMLDocuments(List<String> indexFilesFolders) {
     	Path rootPath = Paths.get(System.getProperty("user.dir"));
 
         try {
@@ -53,11 +71,17 @@ public class Indexer {
                             org.w3c.dom.Document xmlDoc = dBuilder.parse(file.toFile());
                             String label = xmlDoc.getDocumentElement().getAttribute("templaterules-keyword");
 
+                            // Retrieve the English keyword from the SQLite database based on the label
+                            String englishKeyword = getEnglishKeywordFromDatabase(label);
+
                             // Create a Lucene document and add it to the index
                             Document luceneDoc = new Document();
                             luceneDoc.add(new TextField("content", content, Field.Store.YES));
                             luceneDoc.add(new StringField("filename", file.getFileName().toString(), Field.Store.YES));
                             luceneDoc.add(new StringField("label", label, Field.Store.YES));
+                            if (englishKeyword != null && !englishKeyword.isEmpty()) {
+                            	luceneDoc.add(new StringField("en_keyword", englishKeyword, Field.Store.YES));
+                            }
                             indexWriter.addDocument(luceneDoc);
                         }
                     }
@@ -80,5 +104,28 @@ public class Indexer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    private String getEnglishKeywordFromDatabase(String label) {
+    	try {
+    		label = label.substring(3); // remove wd: prefix
+    	}
+    	catch (StringIndexOutOfBoundsException e) {
+    		return ""; // There's no index at all
+    	}
+        try {
+            String sql = "SELECT english_label FROM label_mapping WHERE structured_label = ? LIMIT 1";
+            try (PreparedStatement statement = databaseConnection.prepareStatement(sql)) {
+                statement.setString(1, label);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getString("english_label");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null; // Handle the case where the label doesn't have an associated English keyword
     }
 }

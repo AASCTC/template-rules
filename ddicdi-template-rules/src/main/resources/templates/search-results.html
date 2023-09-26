@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+</head>
+<body>
+    <h1>Search Results</h1>
+    <ul>
+        <li th:each="result, rowStat : ${results}">
+            <p th:text="${result.content}"></p>
+            <a th:href="@{'/download/' + ${rowStat.index}}" download="document.xml">Download</a>
+        </li>
+    </ul>
+    <p th:if="${error}" th:text="${error}"></p>
+    <a href="/">Back to Search</a>
+</body>
+</html>
