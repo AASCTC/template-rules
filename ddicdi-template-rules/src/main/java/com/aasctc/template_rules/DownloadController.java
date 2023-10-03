@@ -1,30 +1,29 @@
 package com.aasctc.template_rules;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Paths;
-import java.util.List;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.lucene.document.Document;
+import java.io.IOException;
+import java.util.List;
 
 @Controller
 public class DownloadController {
     @GetMapping("/download/{index}")
-    public void download(@PathVariable int index, HttpServletResponse response, @ModelAttribute("searchResults") List<Document> searchResults) throws IOException {
+    public void download(@PathVariable int index, HttpServletResponse response, HttpSession session) throws IOException {
+    	List<ResultSet> searchResults = (List<ResultSet>) session.getAttribute("results");  
         if (index >= 0 && index < searchResults.size()) {
-            Document document = searchResults.get(index);
-            String xmlContent = document.get("content"); // Assuming content is the XML as a string
+            ResultSet document = searchResults.get(index);
+            String xmlContent = document.getContent();
+            String fileName = document.getFilename();
 
             // Set the response headers for download
-            response.setHeader("Content-Disposition", "attachment; filename=document.xml");
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
             response.setContentType("application/xml"); // Set the content type to XML
 
             // Convert the XML string to bytes

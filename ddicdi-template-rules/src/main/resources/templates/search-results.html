@@ -7,8 +7,9 @@
 <body>
     <h1>Search Results</h1>
     <ul>
-        <li th:each="result, rowStat : ${results}">
-            <p th:text="${result.content}"></p>
+        <li th:each="result, rowStat : ${session.results}">
+			<h2 th:text="${result.filename}"></h2>
+            <p th:text="${result.truncatedContent}"></p>
             <a th:href="@{'/download/' + ${rowStat.index}}" download="document.xml">Download</a>
         </li>
     </ul>

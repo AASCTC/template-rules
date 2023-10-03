@@ -73,11 +73,14 @@ public class Indexer {
 
                             // Retrieve the English keyword from the SQLite database based on the label
                             String englishKeyword = getEnglishKeywordFromDatabase(label);
+                            
+                            String fileName = file.getFileName().toString();
+                            fileName = fileName.replaceAll("\\.xml$", "");
 
                             // Create a Lucene document and add it to the index
                             Document luceneDoc = new Document();
                             luceneDoc.add(new TextField("content", content, Field.Store.YES));
-                            luceneDoc.add(new StringField("filename", file.getFileName().toString(), Field.Store.YES));
+                            luceneDoc.add(new StringField("filename", fileName, Field.Store.YES));
                             luceneDoc.add(new StringField("label", label, Field.Store.YES));
                             if (englishKeyword != null && !englishKeyword.isEmpty()) {
                             	luceneDoc.add(new StringField("en_keyword", englishKeyword, Field.Store.YES));

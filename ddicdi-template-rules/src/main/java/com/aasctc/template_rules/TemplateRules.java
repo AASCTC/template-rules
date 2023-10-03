@@ -46,8 +46,8 @@ public class TemplateRules {
 		try {
 			cmd = cliParser.parse(options, args);
 		} catch (ParseException e) {
-			logger.error("Failed to parse arguments");
-			e.printStackTrace();
+			logger.warn("Failed to parse arguments, defaulting to starting Spring Boot Application server");
+			TemplateRulesWebServer.main(args);
 			return;
 		}
 
@@ -87,7 +87,7 @@ public class TemplateRules {
         }
         
         else {
-        	// Start the Spring Boot Application
+        	logger.info("Starting the Spring Boot Application");
         	TemplateRulesWebServer.main(args);
         }
         	

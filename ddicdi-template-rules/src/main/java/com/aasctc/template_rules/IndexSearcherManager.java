@@ -26,7 +26,7 @@ public class IndexSearcherManager {
     private QueryParser queryParser;
 
     public IndexSearcherManager() throws IOException {
-        indexDirectory = FSDirectory.open(Paths.get(System.getProperty("user.dir")));
+        indexDirectory = FSDirectory.open(Paths.get("data/lucene").toAbsolutePath());
         indexReader = DirectoryReader.open(indexDirectory);
         indexSearcher = new IndexSearcher(indexReader);
 
@@ -43,8 +43,8 @@ public class IndexSearcherManager {
         queryParser = new MultiFieldQueryParser(new String[]{"content", "label"}, new StandardAnalyzer());
     }
 
-    public List<Document> searchByQuery(String queryText) throws ParseException, IOException {
-        List<Document> results = new ArrayList<>();
+    public List<ResultSet> searchByQuery(String queryText) throws ParseException, IOException {
+        List<ResultSet> results = new ArrayList<>();
 
         // Create a query to search for the query text in multiple fields
         Query query = queryParser.parse(queryText);
@@ -54,7 +54,10 @@ public class IndexSearcherManager {
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
             int docId = scoreDoc.doc;
             Document document = indexReader.document(docId);
-            results.add(document);
+            ResultSet result = new ResultSet();
+            result.setContent(document.get("content"));
+            result.setFilename(document.get("filename"));
+            results.add(result);
         }
 
         return results;
